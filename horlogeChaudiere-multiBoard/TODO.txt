@@ -1,0 +1,24 @@
+liste des todo du projet
+
+- ajouter carte SD
+- ajouter roue codeuse
+- fonction de scan automatique de l'interface I2C de l'afficheur
+- creer des plages modeles et des plages utilisateur
+- fonction temperature min et max (avec reset)
+- associer les adresses mac des arduino a des ip fixes sur livebox maison et webcom (avec nom local si possible)
+- memoriser donnees sur carte SD (soit dans un fichier soit en base de donnée sqlite)
+    - parametres wifi (sssid + paswd)
+    - plages de fonctionnement (heure debut et fin pour chaque jour, plusieurs plage possible par jour)
+    - plages modèles et plages utilisateur
+    - consigne
+    - mesures temperatures min et max avec date et heure
+    - agregation des donnees de temperature dans base a taille constante
+        - donnees reelles sur 1 mois
+        - conserver 12 mois 
+        - conserver 10 ans
+        - conserver moyenne totale
+    - chauffage on/off
+    - parametres de regulation s'il y en afficheur
+    - adresses des autres arduino (capteurs de temperature distants)
+    - plages modèles
+    
