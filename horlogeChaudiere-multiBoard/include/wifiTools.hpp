@@ -25,7 +25,7 @@
 #endif
 
     extern bool getChauffageOnOff(void);
-    extern void initWifi(void);
+    extern bool initWifi(void);
     extern void handleWebRequete(void);
     extern String piedDePage;
     extern String listeDonneesChauffage(void);

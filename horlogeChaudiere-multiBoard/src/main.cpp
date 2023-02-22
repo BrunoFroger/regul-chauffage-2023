@@ -34,6 +34,15 @@
 
 //=================================================
 //
+//      stop
+//
+//=================================================
+void stop(void){
+    while(1);
+}
+
+//=================================================
+//
 //      setup
 //
 //=================================================
@@ -48,7 +57,7 @@ void setup() {
         delay(10);
     }
     char titre[50];
-    sprintf(titre, "+         %s         +", TITRE);
+    sprintf(titre, "+    %25s      +", TITRE);
     delay(1000);
     Serial.println("Serial initialized");
     Serial.println("+-------------------------------+");
@@ -59,8 +68,8 @@ void setup() {
     Serial.println("+-------------------------------+");
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
-    sdcardInit();
-    initWifi();
+    if (!sdcardInit()) stop();
+    if (!initWifi()) stop();
     initNtp();
     initCalendrier();
     initAfficheur();

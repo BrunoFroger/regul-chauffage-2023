@@ -21,6 +21,7 @@
     #pragma message("lolin_s2_mini")
     ESP8266WebServer server(80);
 #elif wemos_d1_mini32 
+    #include <SPI.h>
     #include <WiFi.h>
     #include <WebServer.h>
     #define BOARD "Wemos D1 mini esp32"
@@ -145,7 +146,7 @@ void handleRoot() {
     page += "<head>\n";
     page += "    <title> Gestion chauffage </title>\n";
     page += "    <meta charset='UTF-8'/>\n";
-    page += "    <meta http-equiv='refresh' content='60'> ";
+    page += " setSleep   <meta http-equiv='refresh' content='60'> ";
     page += "</head>\n";
 
     page += "<body>\n";
@@ -185,7 +186,7 @@ void handleRoot() {
 //      initWifi
 //
 //----------------------------------------------
-void initWifi(void){
+bool initWifi(void){
 
     Serial.println("======================");
     Serial.println("|     Init Wifi      |");
@@ -193,11 +194,15 @@ void initWifi(void){
     Serial.println("initWifi => debut");
     strcpy(wifiSsid, localWifiSsid);
     strcpy(wifiPwd, localWifiPwd);
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
     delay(100);
     //Serial.println("initWifi => check wifi status");
     if (WiFi.status() == WL_NO_SHIELD){
         Serial.println("initWifi => ERROR : No shield detected !!");
-        return;
+        Serial.print("error code = ");
+        Serial.println(WiFi.status());
+        return false;
     }
     Serial.println("initWifi => a shield is detected");
     delay(1000);
@@ -234,7 +239,7 @@ void initWifi(void){
         // on a  fait 20 tentatives
         // imposible de se connecter au wifi !
         Serial.println("\nWifi non connecte");
-        return;
+        return false;
     } else {
         // on a reussit a se connecter au wifi
         Serial.println("");
@@ -282,4 +287,5 @@ void initWifi(void){
     piedDePage +=          copyright;
     piedDePage +=          "</i>\n";
     piedDePage += "    </div>\n";
+    return true;
 }

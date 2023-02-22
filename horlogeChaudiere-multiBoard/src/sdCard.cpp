@@ -16,7 +16,15 @@
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
 // LOLIN Micro SD Shield V1.2.0: D4 (Default)
-const int chipSelect = D4;
+#ifdef lolin_s2_mini
+    const int chipSelect = D4;
+#elif wemos_d1_mini32 
+    const int chipSelect = D8;
+#elif adafruit_feather_m0 
+    const int chipSelect = D8;
+#else 
+    #error Unsupported board selection.
+#endif
 
 File myFile;
 String environnement;
@@ -135,7 +143,7 @@ void analyseLigne(String ligne){
 //----------------------------------------------
 void readConfig(void){
     String ligne;
-    String filename = "chaudiere/config.txt";
+    String filename = "/chaudiere/config.txt";
     myFile = SD.open(filename);
 
     if (myFile){
@@ -267,17 +275,18 @@ void writeConfig(void){
 //      sdcardInit
 //
 //----------------------------------------------
-void sdcardInit(void){
+bool sdcardInit(void){
 
     Serial.print("Initializing SD card  ...   ");
     insideEnvironnement=false;
 
     if (!SD.begin(chipSelect)) {
         Serial.println("initialization failed!");
-        return;
+        return false;
     }
     Serial.println("initialization done.");
     readConfig();
+    return true;
 }
 
 //----------------------------------------------
