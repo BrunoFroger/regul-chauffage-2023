@@ -57,6 +57,16 @@ char *getWifiSsid(){
 
 //----------------------------------------------
 //
+//      setWifiParameters
+//
+//----------------------------------------------
+void setWifiParameters(char *ssid, char *pwd){
+    strcpy(wifiSsid, ssid);
+    strcpy(wifiPwd, pwd);
+}
+
+//----------------------------------------------
+//
 //      getIpAddress
 //
 //----------------------------------------------

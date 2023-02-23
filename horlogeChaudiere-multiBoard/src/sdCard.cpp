@@ -29,16 +29,25 @@
 File myFile;
 String environnement;
 bool insideEnvironnement;
+int pin_relai;
+bool SdChauffageOnOff;
+int SdConsigne;
+
+#define NB_ENVIRONNEMENTS   10
 
 struct structEnvironnement{
-    String nom;
-    String wifiSsid;
-    String wifiPwd;
-    String ipTempInt;
+    int index;
+    char nom[20];
+    char wifiSsid[20];
+    char wifiPwd[25];
+    char ipTempInt[20];
 };
 
-structEnvironnement *listeEnvironnement[10];
-structEnvironnement *newEnvironnement;
+structEnvironnement listeEnvironnement[NB_ENVIRONNEMENTS];
+//structEnvironnement *newEnvironnement;
+int indexEnvironnementCourant;
+
+String tmpValeur;
 
 //----------------------------------------------
 //
@@ -46,11 +55,34 @@ structEnvironnement *newEnvironnement;
 //
 //----------------------------------------------
 String getValeur(String ligne){
-    String tmp;
-    int i = ligne.indexOf('=') + 1;
-    while (tmp[i++] == ' ');
-    tmp = ligne.substring(i);
-    return tmp;
+    tmpValeur = "";
+    //Serial.print("environnement : ");
+    //Serial.println(indexEnvironnementCourant);
+    int i = ligne.indexOf('=') + 1; // i = debut chaine apres le =
+    while (tmpValeur[i++] == ' '); // on supprime les blancs apres le =
+    tmpValeur = ligne.substring(i); // i correspond au debut de la chaine definissant la valeur
+    //Serial.println("getValeur : <" + tmpValeur + ">");
+    return tmpValeur;
+}
+
+//----------------------------------------------
+//
+//      listeEnvironnements
+//
+//----------------------------------------------
+void listeEnvironnements(void){
+    char ligne[100];
+    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
+    Serial.print("| idx |   nom     |      ssid            |     pwd              |   ip capt temp    |\n");
+    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
+    for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
+        if (strcmp(listeEnvironnement[i].nom, "") != 0){
+            structEnvironnement *env = &listeEnvironnement[i];
+            sprintf(ligne, "|  %d  |%10s | %20s | %20s | %17s |\n", i, env->nom, env->wifiSsid, env->wifiPwd, env->ipTempInt);
+            Serial.print(ligne);
+        }
+    }
+    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
 }
 
 //----------------------------------------------
@@ -59,16 +91,20 @@ String getValeur(String ligne){
 //
 //----------------------------------------------
 void initEnvironnement(String ligne){
-    String nomEnvironnement = ligne.substring(1, ligne.indexOf(']'));
-    Serial.println("initEnvironnement : nom de l'environemment => <" + nomEnvironnement + ">");
-    newEnvironnement = (structEnvironnement*) malloc(sizeof(structEnvironnement));
-    newEnvironnement->nom = nomEnvironnement;
-    newEnvironnement->ipTempInt = "";
-    newEnvironnement->wifiSsid = "";
-    newEnvironnement->wifiPwd = "";
-    for (int i = 0 ; i < 10 ; i++){
-        if (listeEnvironnement[i] == nullptr){
-            listeEnvironnement[i] = newEnvironnement;
+    char nomEnvironnement[20];
+    strcpy(nomEnvironnement,ligne.substring(1, ligne.indexOf(']')).c_str());
+    //Serial.print("initEnvironnement : nom de l'environemment => <");
+    //Serial.print(nomEnvironnement);
+    //Serial.println(">");
+    for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
+        if (strcmp(listeEnvironnement[i].nom, "") == 0){
+            structEnvironnement *env = &listeEnvironnement[i];
+            env->index = i;
+            strcpy(env->nom, nomEnvironnement);
+            strcpy(env->wifiSsid, "");
+            strcpy(env->wifiPwd, "");
+            strcpy(env->ipTempInt, "");
+            indexEnvironnementCourant = i;
             break;
         }
     }
@@ -77,21 +113,48 @@ void initEnvironnement(String ligne){
 
 //----------------------------------------------
 //
+//      setEnvironnement
+//
+//----------------------------------------------
+void setEnvironnement(String envName){
+    //Serial.println("setEnvironnement : nom de l'environemment => <" + envName + ">");
+    for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
+        structEnvironnement *env = &listeEnvironnement[i];
+        if (envName = env->nom){
+            setIPCapteurTemperature(env->ipTempInt);
+            setWifiParameters(env->wifiSsid, env->wifiPwd);
+            return;
+        }
+    }
+    Serial.print("ERREUR : environnement ");
+    Serial.print(envName);
+    Serial.println(" inconnu");
+
+}
+
+//----------------------------------------------
+//
 //      analyseLigne
 //
 //----------------------------------------------
 void analyseLigne(String ligne){
+    String tmpData;
     //Serial.println("sdCard => analyse ligne : " + ligne);
     //Serial.println(ligne);
     if (ligne.length() == 0){
-        insideEnvironnement = false;
+        if (insideEnvironnement){
+            //listeEnvironnements();
+            insideEnvironnement = false;
+        }
         return;
     } 
     if (ligne[0] == '#') return;
-    else if (ligne.startsWith(String("["))){
+    //Serial.println("----------------------------");
+    tmpData = getValeur(ligne);
+    if (ligne.startsWith(String("["))){
         if (!insideEnvironnement){
             // traitement de debut d'environnement
-            Serial.println("traitement de debut d'environnement");
+            //Serial.println("traitement de debut d'environnement");
             initEnvironnement(ligne);
         } else {
             Serial.print("ERREUR ......\n");
@@ -100,36 +163,60 @@ void analyseLigne(String ligne){
         }
     } else if (ligne.startsWith(String("CONSIGNE"))){
         // traitement de la valeur de consigne
-        Serial.println("traitement de la consigne");
-        setConsigne(getValeur(ligne).toInt());
+        //Serial.println("traitement de la consigne");
+        SdConsigne = tmpData.toInt();
+        setConsigne(SdConsigne);
+
+        //Serial.print("consigne = ");
+        ///Serial.print(getConsigne());
+        //Serial.println();
     } else if (ligne.startsWith("ENV")){
         // fixe l'environnement a traiter
-        Serial.println("fixe l'environnement a traiter");
-        environnement = getValeur(ligne);
-        Serial.print("Utilisation de l'environnement : <");
-        Serial.print(environnement);
-        Serial.println(">");
+        //Serial.println("fixe l'environnement a traiter");
+        environnement = tmpData;
+        //Serial.print("Utilisation de l'environnement : <");
+        //Serial.print(environnement);
+        //Serial.println(">");
+        setEnvironnement(environnement);
     } else if (ligne.startsWith("WIFI_SSID")){
         // fixe le nom du ssid
-        newEnvironnement->wifiSsid = getValeur(ligne);
-        Serial.println("fixe nom du ssid");
-        Serial.print("ssid = <");
-        Serial.print(newEnvironnement->wifiSsid);
-        Serial.println(">");
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        strcpy(env->wifiSsid, tmpData.c_str());
+        //Serial.println("fixe nom du ssid");
+        //Serial.print("ssid = <");
+        //Serial.print(env->wifiSsid);
+        //Serial.println(">");
     } else if (ligne.startsWith("WIFI_PWD")){
         // fixe le nom du wifi Pwd
-        newEnvironnement->wifiPwd = getValeur(ligne);
-        Serial.println("fixe nom du wifi Pwd");
-        Serial.print("ssid = <");
-        Serial.print(newEnvironnement->wifiPwd);
-        Serial.println(">");
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        strcpy(env->wifiPwd, tmpData.c_str());
+        //Serial.println("fixe nom du wifi Pwd");
+        //Serial.print("pwd = <");
+        //Serial.print(env->wifiPwd);
+        //Serial.println(">");
     } else if (ligne.startsWith("IP_TEMP_INT")){
         // fixe l'adresse du capteur de temperature
-        newEnvironnement->ipTempInt = getValeur(ligne);
-        Serial.println("fixe l'adresse du capteur de temperature");
-        Serial.print("ssid = <");
-        Serial.print(newEnvironnement->ipTempInt);
-        Serial.println(">");
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        strcpy(env->ipTempInt, tmpData.c_str());
+        //Serial.println("fixe l'adresse du capteur de temperature");
+        //Serial.print("ip temp int = <");
+        //Serial.print(env->ipTempInt);
+        //Serial.println(">");
+    } else if (ligne.startsWith("CHAUFFAGE")){
+        // fixe l'activation ou non du chauffage
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        if (tmpData == "on"){
+            SdChauffageOnOff = true;
+        } else {
+            SdChauffageOnOff = false;
+        }
+        setChauffageOnOff(SdChauffageOnOff);
+    } else if (ligne.startsWith("PIN_RELAI")){
+        // fixe la broche sur laquelle est connectee le relai de pilotage
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        Serial.print("AnalyseLigne : pinRelai = ");
+        Serial.println(tmpData.toInt());
+        setPinRelai(tmpData.toInt());
     } else {
         Serial.print("ligne invalide : ");
         Serial.println(ligne);
@@ -241,11 +328,19 @@ void writeConfig(void){
     page += "\n";
     
     for (int i = 0 ; i < 10 ; i++){
-        if (listeEnvironnement[i] != nullptr){
-            page += "[" + listeEnvironnement[i]->nom + "]\n";
-            page += "WIFI_SSID = " + listeEnvironnement[i]->wifiSsid + "\n";
-            page += "WIFI_PWD = " + listeEnvironnement[i]->wifiPwd + "\n";
-            page += "IP_TEMP_INT = " + listeEnvironnement[i]->ipTempInt + "\n";
+        if (strcmp(listeEnvironnement[i].nom, "") != 0){
+            page += "[";
+            page += listeEnvironnement[i].nom ;
+            page += "]\n";
+            page += "WIFI_SSID = ";
+            page += listeEnvironnement[i].wifiSsid;
+            page += "\n";
+            page += "WIFI_PWD = ";
+            page += listeEnvironnement[i].wifiPwd;
+            page += "\n";
+            page += "IP_TEMP_INT = ";
+            page += listeEnvironnement[i].ipTempInt;
+            page += "\n";
             page += "\n";
         } else {
             break;
@@ -253,10 +348,10 @@ void writeConfig(void){
     }
 
     if (getConsigne() != consigneReferenceJour){
-        page += "CONSIGNE = " + getConsigne();
+        page += "CONSIGNE = " + SdConsigne;
         page += "]\n";
     }
-    if (getChauffageOnOff()){
+    if (SdChauffageOnOff){
         page += "CHAUFFAGE = ON\n";
     } else {
         page += "CHAUFFAGE = OFF\n";
@@ -279,6 +374,10 @@ bool sdcardInit(void){
 
     Serial.print("Initializing SD card  ...   ");
     insideEnvironnement=false;
+    for (int i = 0 ; i < 10 ; i++){
+        strcpy(listeEnvironnement[i].nom, "");
+    }
+    //listeEnvironnements();
 
     if (!SD.begin(chipSelect)) {
         Serial.println("initialization failed!");
@@ -286,6 +385,19 @@ bool sdcardInit(void){
     }
     Serial.println("initialization done.");
     readConfig();
+    Serial.print("consigne      = ");
+    Serial.println(getConsigne());
+    Serial.print("chauffage     = ");
+    if (getChauffageOnOff()) {
+        Serial.println("ON");
+    } else {
+        Serial.println("OFF");
+    }
+    Serial.print("environnement = ");
+    Serial.println(environnement);
+    Serial.print("pin relai     = ");
+    Serial.println(getPinRelai());
+    listeEnvironnements();
     return true;
 }
 
@@ -347,9 +459,24 @@ void handleConfig(void){
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
-    page += "                   <td>Environnement</td>\n";
+    page += "                   <td>Environnement utilise</td>\n";
     page += "                   <td>";
     page +=                         environnement;
+    page += "                   </td>\n";
+    page += "               <tr>\n";
+    page += "                   <td>Pin relai</td>\n";
+    page += "                   <td>";
+    page +=                         getPinRelai();
+    page += "                   </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td>chauffage</td>\n";
+    page += "                   <td>";
+    if (getChauffageOnOff()){
+        page += "                  ON";
+    } else {
+        page += "                  OFF";
+    }
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "           </tbody>\n";
@@ -369,19 +496,19 @@ void handleConfig(void){
     page += "           </thead>\n";
     page += "           <tbody>\n";
     for (int i = 0 ; i < 10 ; i++){
-        if (listeEnvironnement[i] != nullptr){
+        if (strcmp(listeEnvironnement[i].nom,"") != 0){
             page += "       <tr>\n";
             page += "           <td>\n";
-            page +=                 listeEnvironnement[i]->nom;
+            page +=                 listeEnvironnement[i].nom;
             page += "           </td>\n";
             page += "           <td>\n";
-            page +=                 listeEnvironnement[i]->wifiSsid;
+            page +=                 listeEnvironnement[i].wifiSsid;
             page += "           </td>\n";
             page += "           <td>\n";
-            page +=                 listeEnvironnement[i]->wifiPwd;
+            page +=                 listeEnvironnement[i].wifiPwd;
             page += "           </td>\n";
             page += "           <td>\n";
-            page +=                 listeEnvironnement[i]->ipTempInt;
+            page +=                 listeEnvironnement[i].ipTempInt;
             page += "           </td>\n";
             page += "       </tr>\n";
         }

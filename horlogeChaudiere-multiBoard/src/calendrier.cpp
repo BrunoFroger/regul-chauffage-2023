@@ -116,7 +116,7 @@ void initCalendrier(void){
     Serial.print ("la taille du calendrier est : ");
     Serial.println(sizeof(calendrier));
 
-    if (1){
+    if (0){
         lireFichier("chaudiere/calendrier.dat", &calendrier);
     } else {
         for (int j = 0 ; j < NB_JOURS ; j++){

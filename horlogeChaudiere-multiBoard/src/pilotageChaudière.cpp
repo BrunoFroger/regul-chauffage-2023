@@ -17,6 +17,7 @@
 // pinoutRelai defini dans platformIO.ini
 int pinRelai = pinoutRelai;
 bool circulateurOnOff;
+bool lastCirculateurOnOff;
 bool chauffageOnOff;
 int commandeVanneChauffage;
 
@@ -41,6 +42,18 @@ void initChaudiere(void){
 //----------------------------------------------
 int getCommandeVanneChauffage(){
     return commandeVanneChauffage;
+}
+
+//----------------------------------------------
+//
+//      setPinRelai
+//
+//----------------------------------------------
+void setPinRelai(int pin){
+    Serial.print("nouvelle valeur de pin relai : ");
+    Serial.println(pin);
+    pinRelai = pin;
+    pinMode(pinRelai, OUTPUT);
 }
 
 //----------------------------------------------
@@ -78,11 +91,17 @@ void refreshChaudiere(void){
     }
 
     // pilotage du relai de chauffage
-    if (circulateurOnOff){
-        digitalWrite(pinRelai, HIGH);
-    } else {
-        digitalWrite(pinRelai, LOW);
+    if (lastCirculateurOnOff != circulateurOnOff){    
+        if (circulateurOnOff){
+            digitalWrite(pinRelai, HIGH);
+            Serial.println("set circulateur ON");
+        } else {
+            digitalWrite(pinRelai, LOW);
+            Serial.println("set circulateur OFF");
+        }
+        lastCirculateurOnOff = circulateurOnOff;
     }
+
 }
 
 //----------------------------------------------
@@ -217,4 +236,13 @@ void handleSwitchChauffageOnOff(void){
 //----------------------------------------------
 bool getChauffageOnOff(){
     return chauffageOnOff;
+}
+
+//----------------------------------------------
+//
+//      getChauffageOnOff
+//
+//----------------------------------------------
+void setChauffageOnOff(bool onOff){
+    chauffageOnOff = onOff ;
 }

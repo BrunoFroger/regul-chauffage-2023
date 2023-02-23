@@ -57,7 +57,7 @@ void setup() {
         delay(10);
     }
     char titre[50];
-    sprintf(titre, "+    %25s      +", TITRE);
+    sprintf(titre, "+  %25s    +", TITRE);
     delay(1000);
     Serial.println("Serial initialized");
     Serial.println("+-------------------------------+");

@@ -15,7 +15,9 @@
     extern void handleCommandeChauffage();
     extern void handleSwitchChauffageOnOff(void);
     extern bool getChauffageOnOff();
+    extern void setChauffageOnOff(bool onOff);
     extern int getCommandeVanneChauffage();
     extern int getPinRelai(void);
+    extern void setPinRelai(int pin);
 
 #endif

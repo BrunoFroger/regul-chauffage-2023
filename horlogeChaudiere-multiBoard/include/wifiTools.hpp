@@ -31,4 +31,5 @@
     extern String listeDonneesChauffage(void);
     extern char *getIpAddress(void);
     extern char *getWifiSsid(void);
+    extern void setWifiParameters(char *ssid, char *pwd);
 #endif

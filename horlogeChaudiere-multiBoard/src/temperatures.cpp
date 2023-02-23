@@ -32,8 +32,8 @@
 // les temperatures sont exprimées en 1/10 de degres
 int temperatureInterieure;
 int temperatureExterieure;
-int consigneTemperature;
-char localIPCapteurTemperature[50];
+int consigneTemperature = -1;
+char localIPCapteurTemperature[50] = "";
 
 char baseUrl[50] = "/getTemperatureInterieure";
 int delayRefreshTemperatures = 5000;
@@ -50,8 +50,12 @@ WiFiClient client;
     Serial.println("=======================");
     Serial.println("     Init Temperatures ");
     Serial.println("-----------------------");
-    consigneTemperature = consigneReferenceJour;
-    strcpy(localIPCapteurTemperature, IPcapteurTemperature);
+    if (consigneTemperature == -1){
+        consigneTemperature = consigneReferenceJour;
+    }
+    if (strcmp(localIPCapteurTemperature, "") == 0){
+        strcpy(localIPCapteurTemperature, IPcapteurTemperature);
+    }
 }
 
 //----------------------------------------------
@@ -100,7 +104,7 @@ void refreshTemperatures(void){
         lastRefreshTemperatures = millis();
         char ligne[200];
         char url[100];
-        sprintf(url, "http://%s%s", IPcapteurTemperature, baseUrl);
+        sprintf(url, "http://%s%s", localIPCapteurTemperature, baseUrl);
         http.begin(client, url);
         //http.begin(client, IPcapteurTemperature, 80, baseUrl);
         int httpCode = http.GET();
