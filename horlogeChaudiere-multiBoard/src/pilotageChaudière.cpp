@@ -20,28 +20,39 @@ bool circulateurOnOff;
 bool lastCirculateurOnOff;
 bool chauffageOnOff;
 int commandeVanneChauffage;
+bool modeRegulation=false;
 
 //----------------------------------------------
 //
-//      initChaudiere
+//      setRegulation
 //
 //----------------------------------------------
-void initChaudiere(void){
-    Serial.println("=====================================");
-    Serial.println("     Init pilotage chaudière (relai) ");
-    Serial.println("------------------------------------");
-    commandeVanneChauffage=0;
-    chauffageOnOff=false;
-    pinMode(pinRelai, OUTPUT);
+void setRegulation(bool etat){
+    modeRegulation = etat;
 }
 
 //----------------------------------------------
 //
-//      getCommandeVanneChauffage
+//      getRegulationMode
 //
 //----------------------------------------------
-int getCommandeVanneChauffage(){
-    return commandeVanneChauffage;
+bool getRegulationMode(void){
+    return modeRegulation;
+}
+
+//----------------------------------------------
+//
+//      setRelai
+//
+//----------------------------------------------
+void setRelai(bool etat){
+    if (etat){
+        digitalWrite(pinRelai, LOW);
+        Serial.println("set circulateur ON");
+    } else {
+        digitalWrite(pinRelai, HIGH);
+        Serial.println("set circulateur OFF");
+    }
 }
 
 //----------------------------------------------
@@ -54,6 +65,30 @@ void setPinRelai(int pin){
     Serial.println(pin);
     pinRelai = pin;
     pinMode(pinRelai, OUTPUT);
+    setRelai(false);
+}
+
+//----------------------------------------------
+//
+//      initChaudiere
+//
+//----------------------------------------------
+void initChaudiere(void){
+    Serial.println("=====================================");
+    Serial.println("     Init pilotage chaudière (relai) ");
+    Serial.println("------------------------------------");
+    commandeVanneChauffage=0;
+    chauffageOnOff=false;
+    setPinRelai(pinRelai);
+}
+
+//----------------------------------------------
+//
+//      getCommandeVanneChauffage
+//
+//----------------------------------------------
+int getCommandeVanneChauffage(){
+    return commandeVanneChauffage;
 }
 
 //----------------------------------------------
@@ -83,7 +118,9 @@ void refreshChaudiere(void){
     if (!temperatureAtteinte()){
         circulateurOnOff = getChauffageOnOff() && getChauffageStatus();
         if (circulateurOnOff){
-            commandeVanneChauffage = calculDeltaRegulation(commandeVanneChauffage, getConsigne(), getTemperatureInterieure());
+            if (getRegulationMode){
+                commandeVanneChauffage = calculDeltaRegulation(commandeVanneChauffage, getConsigne(), getTemperatureInterieure());
+            }
         }
     } else {
         circulateurOnOff = false;
@@ -93,11 +130,9 @@ void refreshChaudiere(void){
     // pilotage du relai de chauffage
     if (lastCirculateurOnOff != circulateurOnOff){    
         if (circulateurOnOff){
-            digitalWrite(pinRelai, HIGH);
-            Serial.println("set circulateur ON");
+            setRelai(true);
         } else {
-            digitalWrite(pinRelai, LOW);
-            Serial.println("set circulateur OFF");
+            setRelai(false);
         }
         lastCirculateurOnOff = circulateurOnOff;
     }
@@ -160,7 +195,7 @@ void handleCommandeChauffage() {
     }else {
         page += "               <td align='center'> <a href='/switchChauffageOnOff'>  OFF </a></td>\n";
     }
-    page += "                   <td> activation du chauffage, si ON le calendrier defini la mise en route du circulateur </td>\n";
+    page += "                   <td> activation du chauffage : <br> ON : le calendrier (et la temperature) definissent la mise en route du circulateur <br> OFF : chauffage eteint</td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
     page += "                   <td> plage <a href='/calendrier'>calendrier</a> </td>\n";
@@ -170,6 +205,15 @@ void handleCommandeChauffage() {
         page += "               <td align='center'> OFF </td>\n";
     }
     page += "                   <td> ON si dans une plage active dans le calendrier</td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td> mode regulation </td>\n";
+    if (getRegulationMode()){
+        page += "               <td align='center'> ON </td>\n";
+    }else {
+        page += "               <td align='center'> OFF </td>\n";
+    }
+    page += "                   <td> OFF : seul le calendrier pilote l'allumage de la chaudiere<br> ON : la temperature regule l'allulage de la chaudiere </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
     page += "                   <td> circulateur </td>\n";
@@ -186,6 +230,20 @@ void handleCommandeChauffage() {
     page +=                     commandeVanneChauffage;
     page += "                   </td>\n";
     page += "                   <td> valeur de la commande appliquee a la vanne de chauffage </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td> Consigne </td>";
+    page += "                   <td>\n";
+    page +=                     getConsigne();;
+    page += "                   </td>\n";
+    page += "                   <td> Consigne de temperature </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td> temperature interieure </td>";
+    page += "                   <td>\n";
+    page +=                     getTemperatureInterieure();;
+    page += "                   </td>\n";
+    page += "                   <td> Valeur mesuree de temperature interieure </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
     page += "                   <td> afficheur </td>\n";

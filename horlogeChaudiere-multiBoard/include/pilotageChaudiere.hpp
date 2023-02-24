@@ -19,5 +19,7 @@
     extern int getCommandeVanneChauffage();
     extern int getPinRelai(void);
     extern void setPinRelai(int pin);
+    extern void setRegulation(bool onOff);
+    extern bool getRegulationMode(void);
 
 #endif

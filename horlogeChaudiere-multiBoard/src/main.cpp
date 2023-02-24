@@ -74,6 +74,7 @@ void setup() {
     initCalendrier();
     initAfficheur();
     initTemperatures();
+    initChaudiere();
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");

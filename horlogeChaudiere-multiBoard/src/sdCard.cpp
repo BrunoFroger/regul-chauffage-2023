@@ -205,7 +205,7 @@ void analyseLigne(String ligne){
     } else if (ligne.startsWith("CHAUFFAGE")){
         // fixe l'activation ou non du chauffage
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
-        if (tmpData == "on"){
+        if (tmpData == "ON"){
             SdChauffageOnOff = true;
         } else {
             SdChauffageOnOff = false;
@@ -214,9 +214,19 @@ void analyseLigne(String ligne){
     } else if (ligne.startsWith("PIN_RELAI")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
-        Serial.print("AnalyseLigne : pinRelai = ");
-        Serial.println(tmpData.toInt());
+        //Serial.print("AnalyseLigne : pinRelai = ");
+        //Serial.println(tmpData.toInt());
         setPinRelai(tmpData.toInt());
+    } else if (ligne.startsWith("REGULATION")){
+        // fixe la broche sur laquelle est connectee le relai de pilotage
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        Serial.print("AnalyseLigne : regulation = ");
+        Serial.println(tmpData);
+        if (tmpData == "ON"){
+            setRegulation(true);
+        } else {
+            setRegulation(false);
+        }
     } else {
         Serial.print("ligne invalide : ");
         Serial.println(ligne);
@@ -385,18 +395,24 @@ bool sdcardInit(void){
     }
     Serial.println("initialization done.");
     readConfig();
-    Serial.print("consigne      = ");
+    Serial.print("consigne        = ");
     Serial.println(getConsigne());
-    Serial.print("chauffage     = ");
+    Serial.print("chauffage       = ");
     if (getChauffageOnOff()) {
         Serial.println("ON");
     } else {
         Serial.println("OFF");
     }
-    Serial.print("environnement = ");
+    Serial.print("environnement   = ");
     Serial.println(environnement);
-    Serial.print("pin relai     = ");
+    Serial.print("pin relai       = ");
     Serial.println(getPinRelai());
+    Serial.print("mode regulation = ");
+    if (getRegulationMode()) {
+        Serial.println("ON");
+    } else {
+        Serial.println("OFF");
+    }
     listeEnvironnements();
     return true;
 }
