@@ -91,7 +91,9 @@ void loop(){
     refreshAfficheur();
     refreshNtp();
     refreshChaudiere();
-    refreshTemperatures();
+    if (getRegulationMode){
+        refreshTemperatures();
+    }
     handleWebRequete();
     delay(LOOP_DELAY);
 }
