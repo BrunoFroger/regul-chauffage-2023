@@ -45,6 +45,7 @@ int cptTryWifi = 0;
 char ipLocale[50] = "";
 char ipGateway[50];
 String piedDePage = "";
+String enteteDePage = "";
 
 //----------------------------------------------
 //
@@ -154,9 +155,10 @@ void handleRoot() {
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
+    page += enteteDePage;
     page += "    <title> Gestion chauffage </title>\n";
     page += "    <meta charset='UTF-8'/>\n";
-    page += " setSleep   <meta http-equiv='refresh' content='60'> ";
+    page += "    <meta http-equiv='refresh' content='60'> ";
     page += "</head>\n";
 
     page += "<body>\n";
@@ -297,5 +299,27 @@ bool initWifi(void){
     piedDePage +=          copyright;
     piedDePage +=          "</i>\n";
     piedDePage += "    </div>\n";
+
+    enteteDePage += "    <div>";
+    enteteDePage += "        <table>";
+    enteteDePage += "            <tr>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='/'>home</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='commande'>commande</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='calendrier'>calendrier</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='temperatures'>temperatures</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='config'>config</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "            </tr>";
+    enteteDePage += "        </table>";
+    enteteDePage += "    </div>";
     return true;
 }

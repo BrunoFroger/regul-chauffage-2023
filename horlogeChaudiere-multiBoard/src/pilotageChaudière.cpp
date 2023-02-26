@@ -118,7 +118,7 @@ void refreshChaudiere(void){
     if (!temperatureAtteinte()){
         circulateurOnOff = getChauffageOnOff() && getChauffageStatus();
         if (circulateurOnOff){
-            if (getRegulationMode){
+            if (getRegulationMode()){
                 commandeVanneChauffage = calculDeltaRegulation(commandeVanneChauffage, getConsigne(), getTemperatureInterieure());
             }
         }
@@ -163,9 +163,10 @@ void handleCommandeChauffage() {
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
+    page += enteteDePage;
     page += "   <title> Gestion commande de chauffage </title>\n";
     page += "   <meta charset='UTF-8'/>\n";
-    page += "   <meta http-equiv='refresh' content='60'> ";
+    //page += "   <meta http-equiv='refresh' content='60'> ";
     page += "</head>\n";
 
     page += "<body>\n";
@@ -224,27 +225,29 @@ void handleCommandeChauffage() {
     }
     page += "                   <td> circulateur en route si chauffage ON et dans une plage calendrier ON </td>\n";
     page += "               </tr>\n";
-    page += "               <tr>\n";
-    page += "                   <td> vanne chauffage </td>";
-    page += "                   <td>\n";
-    page +=                     commandeVanneChauffage;
-    page += "                   </td>\n";
-    page += "                   <td> valeur de la commande appliquee a la vanne de chauffage </td>\n";
-    page += "               </tr>\n";
-    page += "               <tr>\n";
-    page += "                   <td> Consigne </td>";
-    page += "                   <td>\n";
-    page +=                     getConsigne();;
-    page += "                   </td>\n";
-    page += "                   <td> Consigne de temperature </td>\n";
-    page += "               </tr>\n";
-    page += "               <tr>\n";
-    page += "                   <td> temperature interieure </td>";
-    page += "                   <td>\n";
-    page +=                     getTemperatureInterieure();;
-    page += "                   </td>\n";
-    page += "                   <td> Valeur mesuree de temperature interieure </td>\n";
-    page += "               </tr>\n";
+    if (getRegulationMode()){
+        page += "           <tr>\n";
+        page += "               <td> vanne chauffage </td>";
+        page += "               <td>\n";
+        page +=                     commandeVanneChauffage;
+        page += "               </td>\n";
+        page += "               <td> valeur de la commande appliquee a la vanne de chauffage </td>\n";
+        page += "           </tr>\n";
+        page += "           <tr>\n";
+        page += "               <td> Consigne </td>";
+        page += "               <td>\n";
+        page +=                     getConsigne();;
+        page += "               </td>\n";
+        page += "               <td> Consigne de temperature </td>\n";
+        page += "           </tr>\n";
+        page += "           <tr>\n";
+        page += "               <td> temperature interieure </td>";
+        page += "               <td>\n";
+        page +=                     getTemperatureInterieure();;
+        page += "               </td>\n";
+        page += "               <td> Valeur mesuree de temperature interieure </td>\n";
+        page += "           </tr>\n";
+    }
     page += "               <tr>\n";
     page += "                   <td> afficheur </td>\n";
     if (getAfficheurOnOff()){

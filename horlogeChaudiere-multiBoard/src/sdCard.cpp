@@ -335,6 +335,8 @@ void writeConfig(void){
     page += "# WIFI_SSID = ssid : nom du point d'accces wifi\n";
     page += "# WIFI_PWD = passwd : passwd du point d'acces wifi\n";
     page += "# IP_TEMP_INT : adresse IP du capteur de temperature interieure (reference pour la regulation)\n";
+    page += "# PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai (26 correspond a D0 sur wemos esp 32, 16 = D0 sur wemos D1 mini)\n";
+    page += "# REGULATION = OFF : prise en compte ou non de la temperature pour piloter la chaudiere (si OFF seul le calendrier pilote la chaudiere)\n";
     page += "\n";
     
     for (int i = 0 ; i < 10 ; i++){
@@ -369,6 +371,11 @@ void writeConfig(void){
     page += "ENV = " + environnement + "\n";
     page += "PIN_RELAI = ";
     page += getPinRelai();
+    if (getRegulationMode){
+        page += "CHAUFFAGE = ON\n";
+    } else {
+        page += "CHAUFFAGE = OFF\n";
+    }
     page += "\n" ;
     page += "\n";
     Serial.print(page);
@@ -452,6 +459,7 @@ void handleConfig(void){
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
+    page += enteteDePage;
     page += "   <title> Configuration </title>\n";
     page += "   <meta charset='UTF-8'/>\n";
     page += "</head>\n";

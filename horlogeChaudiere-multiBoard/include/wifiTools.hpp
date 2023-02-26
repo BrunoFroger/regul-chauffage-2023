@@ -28,6 +28,7 @@
     extern bool initWifi(void);
     extern void handleWebRequete(void);
     extern String piedDePage;
+    extern String enteteDePage;
     extern String listeDonneesChauffage(void);
     extern char *getIpAddress(void);
     extern char *getWifiSsid(void);

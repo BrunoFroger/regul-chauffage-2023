@@ -480,6 +480,7 @@ void pageCalendrier() {
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
+    page += enteteDePage;
     page += "   <title> calendrier de chauffage </title>\n";
     page += "   <meta charset='UTF-8'/>\n";
     page += "</head>\n";

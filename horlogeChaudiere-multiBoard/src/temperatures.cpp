@@ -252,6 +252,7 @@ void handleTemperatures(void){
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
+    page+= enteteDePage;
     page += "   <title> Temperatures </title>\n";
     page += "   <meta charset='UTF-8'/>\n";
     page += "</head>\n";
@@ -283,7 +284,7 @@ void handleTemperatures(void){
     page += "               <tr>\n";
     page += "                   <td>Consigne de chauffage</td>\n";
     page += "                   <td>";
-    sprintf(ligne, "<input type='number' id='consigne' name='consigne' min='0' max='30' value=%.1f>\n", (double)getConsigne()/10);
+    sprintf(ligne, "<input id='consigne' name='consigne' value=%.1f>\n", (double)getConsigne()/10);
     page +=                             ligne;
     page += "                           <button>Valider</button>\n";
     page += "                   </td>\n";
