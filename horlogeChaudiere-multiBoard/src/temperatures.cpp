@@ -221,8 +221,8 @@ void setConsigne(int consigne){
 //
 //----------------------------------------------
 void handleUpdateConsigne(){
-    int tmp = server.arg("consigne").toInt();
-    setConsigne(tmp*10);
+    double tmp = server.arg("consigne").toDouble();
+    setConsigne((int)(tmp*10));
     server.sendHeader("Location", String("/temperatures"), true);
     server.send ( 302, "text/plain", "");
 }

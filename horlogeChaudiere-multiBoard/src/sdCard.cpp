@@ -204,7 +204,6 @@ void analyseLigne(String ligne){
         //Serial.println(">");
     } else if (ligne.startsWith("CHAUFFAGE")){
         // fixe l'activation ou non du chauffage
-        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         if (tmpData == "ON"){
             SdChauffageOnOff = true;
         } else {
@@ -213,13 +212,11 @@ void analyseLigne(String ligne){
         setChauffageOnOff(SdChauffageOnOff);
     } else if (ligne.startsWith("PIN_RELAI")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
-        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         //Serial.print("AnalyseLigne : pinRelai = ");
         //Serial.println(tmpData.toInt());
         setPinRelai(tmpData.toInt());
     } else if (ligne.startsWith("REGULATION")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
-        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         Serial.print("AnalyseLigne : regulation = ");
         Serial.println(tmpData);
         if (tmpData == "ON"){
@@ -359,10 +356,10 @@ void writeConfig(void){
         }
     }
 
-    if (getConsigne() != consigneReferenceJour){
-        page += "CONSIGNE = " + SdConsigne;
-        page += "]\n";
-    }
+    page += "CONSIGNE = ";
+    page += (double)getConsigne()/10.0;
+    page += "\n" ;
+
     if (SdChauffageOnOff){
         page += "CHAUFFAGE = ON\n";
     } else {
@@ -371,14 +368,26 @@ void writeConfig(void){
     page += "ENV = " + environnement + "\n";
     page += "PIN_RELAI = ";
     page += getPinRelai();
-    if (getRegulationMode){
-        page += "CHAUFFAGE = ON\n";
+    page += "\n" ;
+    if (getRegulationMode()){
+        page += "REGULATION = ON\n";
     } else {
-        page += "CHAUFFAGE = OFF\n";
+        page += "REGULATION = OFF\n";
     }
     page += "\n" ;
     page += "\n";
     Serial.print(page);
+
+
+    String filename = "/chaudiere/config.txt";
+    if (SD.exists(filename)){
+        SD.remove(filename);
+    }
+    myFile = SD.open(filename, FILE_WRITE);
+    if (myFile){
+        myFile.print(page);
+        myFile.close();
+    }
 
 }
 
@@ -494,12 +503,22 @@ void handleConfig(void){
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
+    page += "                   <td>Regulation</td>\n";
+    page += "                   <td>";
+    if (getRegulationMode()){
+        page += "                  ON\n";
+    } else {
+        page += "                  OFF\n";
+    }
+    page += "                   </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
     page += "                   <td>chauffage</td>\n";
     page += "                   <td>";
     if (getChauffageOnOff()){
-        page += "                  ON";
+        page += "                  ON\n";
     } else {
-        page += "                  OFF";
+        page += "                  OFF\n";
     }
     page += "                   </td>\n";
     page += "               </tr>\n";
