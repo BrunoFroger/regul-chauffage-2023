@@ -14,5 +14,6 @@
     extern void handleSauveConfig(void);
     extern void sauvegardeFichier(String filename, const uint8_t *datas, int size);
     extern void lireFichier(String filename, void *datas);
+    extern void handleListFichierConfiguration(void);
     
 #endif

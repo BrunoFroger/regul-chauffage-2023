@@ -33,6 +33,7 @@ void setPlageNuit(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceNuit;
     ptrPlage->plageActive = true;
+    Serial.println("plage Nuit selectionnee 22:30 => 6:30");
 }
 
 //----------------------------------------------
@@ -50,6 +51,7 @@ void setPlageLever(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
+    Serial.println("plage Lever selectionnee 6:30 => 8:30");
 }
 
 //----------------------------------------------
@@ -67,6 +69,7 @@ void setPlageCoucher(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
+    Serial.println("plage Coucher selectionnee 21:00 => 23:00");
 }
 
 //----------------------------------------------
@@ -84,6 +87,7 @@ void setPlageAll(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = false;
+    Serial.println("plage 24H selectionnee 0:00 => 23:59");
 }
 
 //----------------------------------------------
@@ -101,6 +105,7 @@ void setPlageJournee(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
+    Serial.println("plage Journee selectionnee 8:00 => 20:00");
 }
 
 //----------------------------------------------
@@ -306,40 +311,53 @@ void handleSwitchPlageOnOff() {
 //
 //----------------------------------------------
 void handleUpdatePlage() {
-    Serial.println("---------------------------");
-    Serial.println("    handleUpdatePlage");
-    String modele = server.arg("modele");
     int heure, minute;
     char debutPlage[20], finPlage[20], tmp[20];
     char ligne[100];
     char newConsigne[10];
+    Serial.println("---------------------------");
+    Serial.println("    handleUpdatePlage");
     sprintf(ligne, "nb parametres = %d", server.args());Serial.println(ligne);
-    strcpy(debutPlage, server.arg("heureDeb").c_str());
-    strcpy(finPlage, server.arg("heureFin").c_str());
-    sprintf(ligne, "nouvelles valeur : debut = %s, fin = %s", debutPlage, finPlage); Serial.println(ligne);
-    // traitement de l'heure de debut
-    strcpy(tmp, debutPlage);
-    tmp[2]='\0';
-    heure = atoi(tmp);
-    strcpy(tmp, &debutPlage[3]);
-    minute = atoi(tmp);
-    calendrier.plagesHoraires[jourEnEdition][plageEnEdition].heureDebut = heure;
-    calendrier.plagesHoraires[jourEnEdition][plageEnEdition].minuteDebut = minute;
-    sprintf(ligne, "mise a jour de la plage %d du jour %d", plageEnEdition, jourEnEdition); Serial.println(ligne);
-    sprintf(ligne, "nouvelles heureDebut : heure = %d, fin = %d", heure, minute); Serial.println(ligne);
-    // traitement de l'heure de fin
-    strcpy(tmp, finPlage);
-    tmp[2]='\0';
-    heure = atoi(tmp);
-    strcpy(tmp, &finPlage[3]);
-    minute = atoi(tmp);
-    calendrier.plagesHoraires[jourEnEdition][plageEnEdition].heureFin = heure;
-    calendrier.plagesHoraires[jourEnEdition][plageEnEdition].minuteFin = minute;
-    sprintf(ligne, "nouvelles heureFin : heure = %d, fin = %d", heure, minute); Serial.println(ligne);
-    // traitement de la consigne
-    strcpy(newConsigne,server.arg("consigne").c_str());
-    sprintf(ligne, "nouvelle consigne = %s", newConsigne); Serial.println(ligne);
-    updateTemperature(&(calendrier.plagesHoraires[jourEnEdition][plageEnEdition].consigne), newConsigne);
+    String modele = server.arg("modele");
+    sprintf(ligne, "modele selectionne = %s", modele.c_str());Serial.println(ligne);
+    if (modele == "nuit"){
+        setPlageNuit(&calendrier.plagesHoraires[jourEnEdition][plageEnEdition]);
+    } else if (modele == "lever"){
+        setPlageLever(&calendrier.plagesHoraires[jourEnEdition][plageEnEdition]);
+    } else if (modele == "coucher"){
+        setPlageCoucher(&calendrier.plagesHoraires[jourEnEdition][plageEnEdition]);
+    } else if (modele == "24h"){
+        setPlageAll(&calendrier.plagesHoraires[jourEnEdition][plageEnEdition]);
+    } else if (modele == "journee"){
+        setPlageJournee(&calendrier.plagesHoraires[jourEnEdition][plageEnEdition]);
+    } else {
+        strcpy(debutPlage, server.arg("heureDeb").c_str());
+        strcpy(finPlage, server.arg("heureFin").c_str());
+        sprintf(ligne, "nouvelles valeur : debut = %s, fin = %s", debutPlage, finPlage); Serial.println(ligne);
+        // traitement de l'heure de debut
+        strcpy(tmp, debutPlage);
+        tmp[2]='\0';
+        heure = atoi(tmp);
+        strcpy(tmp, &debutPlage[3]);
+        minute = atoi(tmp);
+        calendrier.plagesHoraires[jourEnEdition][plageEnEdition].heureDebut = heure;
+        calendrier.plagesHoraires[jourEnEdition][plageEnEdition].minuteDebut = minute;
+        sprintf(ligne, "mise a jour de la plage %d du jour %d", plageEnEdition, jourEnEdition); Serial.println(ligne);
+        sprintf(ligne, "nouvelles heureDebut : heure = %d, fin = %d", heure, minute); Serial.println(ligne);
+        // traitement de l'heure de fin
+        strcpy(tmp, finPlage);
+        tmp[2]='\0';
+        heure = atoi(tmp);
+        strcpy(tmp, &finPlage[3]);
+        minute = atoi(tmp);
+        calendrier.plagesHoraires[jourEnEdition][plageEnEdition].heureFin = heure;
+        calendrier.plagesHoraires[jourEnEdition][plageEnEdition].minuteFin = minute;
+        sprintf(ligne, "nouvelles heureFin : heure = %d, fin = %d", heure, minute); Serial.println(ligne);
+        // traitement de la consigne
+        strcpy(newConsigne,server.arg("consigne").c_str());
+        sprintf(ligne, "nouvelle consigne = %s", newConsigne); Serial.println(ligne);
+        updateTemperature(&(calendrier.plagesHoraires[jourEnEdition][plageEnEdition].consigne), newConsigne);
+    }
     server.sendHeader("Location", String("/calendrier"), true);
     server.send ( 302, "text/plain", "");
 }
@@ -391,7 +409,7 @@ void handleEditHeurePlage() {
     page +=     " du ";
     page +=     getDayString(jourEnEdition);
     page += "   </p>\n";
-    page +=     ligne;
+    //page +=     ligne;
     page += "       <form action='/updatePlage'";
     page += "       <div>";
     page += "           <table>";
@@ -425,9 +443,9 @@ void handleEditHeurePlage() {
     page += "                       <td>";
     page += "                           <select name='modele'>";
     page += "                              <option valeur='libre' selected='selected'>libre</option>";
-    page += "                               <option valeur='nuit'>Nuit</option>";
-    page += "                               <option valeur='lever'>Lever</option>";
-    page += "                               <option valeur='coucher'>Coucher</option>";
+    page += "                               <option valeur='nuit'>nuit</option>";
+    page += "                               <option valeur='lever'>lever</option>";
+    page += "                               <option valeur='coucher'>coucher</option>";
     page += "                               <option valeur='all'>24h</option>";
     page += "                               <option valeur='journee'>journee</option>";
     page += "                           </select>";

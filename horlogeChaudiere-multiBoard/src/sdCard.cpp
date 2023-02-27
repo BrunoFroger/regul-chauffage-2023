@@ -321,13 +321,13 @@ void writeConfig(void){
     page += "# Les paramètres disponibles sont listés ci dessous \n";
     page += "# avec la valeur par defaut s'ils ne sont pas renseignés\n";
     page += "\n";
-    page += "Parametres generaux :\n";
-    page += "# CONSIGNE = 200 : consigne de temperature a maintenir 20,0°\n";
+    page += "# Parametres generaux :\n";
+    page += "# CONSIGNE = 200 : consigne de temperature a maintenir 20,0° (exprime en 1/10 de degre)\n";
     page += "# CHAUFFAGE = OFF : determine si le chauffage est active ou non lors du demarrage du systeme\n";
     page += "# ENV = maison : definition de l'environnement a utiliser\n";
     page += "# PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai\n";
     page += "\n";
-    page += "Parametres d'environnement :\n";
+    page += "# Parametres d'environnement :\n";
     page += "# [NOM_ENV] => liste de definitions de données specifiques a un environnement jusqu'a une ligne vide\n";
     page += "# WIFI_SSID = ssid : nom du point d'accces wifi\n";
     page += "# WIFI_PWD = passwd : passwd du point d'acces wifi\n";
@@ -357,7 +357,7 @@ void writeConfig(void){
     }
 
     page += "CONSIGNE = ";
-    page += (double)getConsigne()/10.0;
+    page += getConsigne();
     page += "\n" ;
 
     if (SdChauffageOnOff){
@@ -488,7 +488,7 @@ void handleConfig(void){
     page += "               <tr>\n";
     page += "                   <td>Consigne</td>\n";
     page += "                   <td>";
-    page +=                         (double)getConsigne()/10.0;
+    page +=                         (double)(getConsigne())/10.0;
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
@@ -566,11 +566,73 @@ void handleConfig(void){
     page += "        <p><a href='/sauveConfig'>  sauver la configuration </a></p>\n";
     page += "    </div>\n";
 
+    page += "    <div>\n";
+    page += "        <p><a href='/listFichierConfig'>  afficher fichier de configuration </a></p>\n";
+    page += "    </div>\n";
+
     page +=      piedDePage;
 
     page += "</body>\n";
     page += "</html>\n";  // Fin de la page HTML
 
+    server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
+    server.send(200, "text/html", page);
+}
+
+
+
+//----------------------------------------------
+//
+//      handleListFichierConfiguration
+//
+//----------------------------------------------
+void handleListFichierConfiguration(void){
+    Serial.println("affichage page liste fichier configuration");
+    String ligne;
+    String filename = "/chaudiere/config.txt";
+    myFile = SD.open(filename);
+
+    String page = "<!DOCTYPE html>\n";
+    page += "<style type=\"text/css\">\n";
+    page += "    table, th, td {\n";
+    page += "        padding: 10px;\n";
+    page += "        border: 1px solid black;\n";
+    page += "        border-collapse: collapse;\n";
+    page += "    }\n";
+    page += "    body{\n";
+    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
+    page += "    }\n";
+    page += "    div{\n";
+    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
+    page += "    }\n";
+    page += "</style>\n";
+
+    page += "<html lang='fr'>\n";
+    page += "<head>\n";
+    page += enteteDePage;
+    page += "   <title> fichier de configuration sur carte SD</title>\n";
+    page += "   <meta charset='UTF-8'/>\n";
+    page += "</head>\n";
+
+    page += "<body>\n";
+    page += "   <h1>fichier de configuration sur carte SD</h1>\n";
+    if (myFile){
+        while (myFile.available()){
+            ligne = myFile.readStringUntil('\n');
+            page += ligne;
+            page += "<br>\n";
+        }
+        myFile.close();
+    } else {
+        Serial.print("Le fichier ");
+        Serial.print(filename);
+        Serial.println(" n'existe pas");
+    }
+
+    page +=      piedDePage;
+
+    page += "</body>\n";
+    page += "</html>\n";  // Fin de la page HTML
     server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
     server.send(200, "text/html", page);
 }

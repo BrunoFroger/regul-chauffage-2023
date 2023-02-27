@@ -287,6 +287,7 @@ bool initWifi(void){
     server.on("/config", handleConfig);
     server.on("/sauveConfig", handleSauveConfig);
     server.on("/sauveCalendrier", handleSauveCalendrier);
+    server.on("/listFichierConfig", handleListFichierConfiguration);
     Serial.println("======================");
 
     Serial.println("initWifi => fin");
