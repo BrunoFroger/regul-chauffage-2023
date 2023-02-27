@@ -259,14 +259,17 @@ void readConfig(void){
 //      sauvegardeFichier
 //
 //----------------------------------------------
-void sauvegardeFichier(String filename, const uint8_t *datas, int size){
+void sauvegardeFichier(String filename, String datas){
+    if (SD.exists(filename)){
+        SD.remove(filename);
+    }
     myFile = SD.open(filename, FILE_WRITE);
     if (myFile){
         Serial.println("sdCard => sauvegarde de " + filename);
-        myFile.write(datas, size);
+        myFile.print(datas);
         myFile.close();
         Serial.print("sdCard => taille du fichier : ");
-        Serial.println(size);
+        Serial.println(sizeof(datas));
     } else {
         Serial.print("impossible d'ouvrir le fichier ");
         Serial.print(filename);

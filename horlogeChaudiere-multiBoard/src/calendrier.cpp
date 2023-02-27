@@ -33,7 +33,7 @@ void setPlageNuit(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceNuit;
     ptrPlage->plageActive = true;
-    Serial.println("plage Nuit selectionnee 22:30 => 6:30");
+    //Serial.println("plage Nuit selectionnee 22:30 => 6:30");
 }
 
 //----------------------------------------------
@@ -51,7 +51,7 @@ void setPlageLever(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
-    Serial.println("plage Lever selectionnee 6:30 => 8:30");
+    //Serial.println("plage Lever selectionnee 6:30 => 8:30");
 }
 
 //----------------------------------------------
@@ -69,7 +69,7 @@ void setPlageCoucher(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
-    Serial.println("plage Coucher selectionnee 21:00 => 23:00");
+    //Serial.println("plage Coucher selectionnee 21:00 => 23:00");
 }
 
 //----------------------------------------------
@@ -87,7 +87,7 @@ void setPlageAll(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = false;
-    Serial.println("plage 24H selectionnee 0:00 => 23:59");
+    //Serial.println("plage 24H selectionnee 0:00 => 23:59");
 }
 
 //----------------------------------------------
@@ -105,7 +105,7 @@ void setPlageJournee(plageHoraire *ptrPlage){
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
     ptrPlage->plageActive = true;
-    Serial.println("plage Journee selectionnee 8:00 => 20:00");
+    //Serial.println("plage Journee selectionnee 8:00 => 20:00");
 }
 
 //----------------------------------------------
@@ -156,7 +156,7 @@ void initCalendrier(void){
     setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
     // plage modele JOURNEE
     setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
-    Serial.print(listeDonneesCalendrier());
+    //Serial.print(listeDonneesCalendrier());
 }
 
 //----------------------------------------------
@@ -236,8 +236,40 @@ bool getChauffageStatus(void){
 //
 //----------------------------------------------
 void handleSauveCalendrier() {
+    String ligne;
+    plageHoraire *ptrPlage;
     Serial.print("sauvegarde du calendrier \n");
-    sauvegardeFichier("chaudiere/calendrier.dat", (const uint8_t *)&calendrier, sizeof(calendrier));
+    ligne = String("modele;nom;heureDeb;MinuteDeb;heureFin;minuteFin;chauffageOnOff;consigne;active\n");
+
+    for (int i = 0 ; i < NB_JOURS ; i++){
+        for (int j = 0 ; j < NB_PLAGES_PAR_JOUR ; j++){
+            ptrPlage = &(calendrier.plagesHoraires[i][j]);
+            ligne += i; 
+            ligne += ";";
+            ligne += j;
+            ligne += ";";
+            ligne += ptrPlage->modele;
+            ligne += ";";
+            ligne += String(ptrPlage->nomPlage);
+            ligne += ";";
+            ligne += ptrPlage->heureDebut;
+            ligne += ";";
+            ligne += ptrPlage->minuteDebut;
+            ligne += ";";
+            ligne += ptrPlage->heureFin;
+            ligne += ";";
+            ligne += ptrPlage->minuteFin;
+            ligne += ";";
+            ligne += ptrPlage->chauffageOnOff;
+            ligne += ";";
+            ligne += ptrPlage->consigne;
+            ligne += ";";
+            ligne += ptrPlage->plageActive;
+            ligne += "\n";
+        }
+    }
+    Serial.print(ligne);
+    sauvegardeFichier("chaudiere/calendrier.txt", ligne);
     server.sendHeader("Location", String("/calendrier"), true);
     server.send ( 302, "text/plain", "");
 }
