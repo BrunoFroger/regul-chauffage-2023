@@ -12,7 +12,7 @@
 #include "wifiTools.hpp"
 #include "temperature.hpp"
 
-LiquidCrystal_I2C lcd(0x23,16,2);
+LiquidCrystal_I2C lcd(i2cDisplayPort,16,2);
 char bufferLigne1[20];
 char bufferLigne2[20];
 int cptValeurs=0;
