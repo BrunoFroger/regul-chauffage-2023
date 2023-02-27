@@ -1,0 +1,54 @@
+Le fichier de configuration sur carte SD ne doit etre éditer manuellement, 
+utiliser de préférence l'application web pour le modifier 
+
+voici un exemple de fichier de configuration
+
+###########################################
+#
+#           Chauffage (config)
+#
+###########################################
+
+# Ce fichier contient les parametres
+# de pilotage d'une chaudiere
+
+# les regles de syntaxe de ce fichier sont les suivantes :
+#	- les lignes qui commences par # sont des commentaires
+#	- le fichier doit se terminer par une ligne vide
+#	- le nom d'une variable doit etre en debut de ligne
+#	- une seule variable par ligne
+#	- les temperatures sont exprimees en 1/10eme de degres (200 pour une temperature de 20°)
+#  - les environnements doivent etre definis avant les parametres generaux
+
+# Les paramètres disponibles sont listés ci dessous 
+# avec la valeur par defaut s'ils ne sont pas renseignés
+
+Parametres generaux :
+# CONSIGNE = 200 : consigne de temperature a maintenir 20,0°
+# CHAUFFAGE = OFF : determine si le chauffage est active ou non lors du demarrage du systeme
+# ENV = maison : definition de l'environnement a utiliser
+# PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai
+
+Parametres d'environnement :
+# [NOM_ENV] => liste de definitions de données specifiques a un environnement jusqu'a une ligne vide
+# WIFI_SSID = ssid : nom du point d'accces wifi
+# WIFI_PWD = passwd : passwd du point d'acces wifi
+# IP_TEMP_INT : adresse IP du capteur de temperature interieure (reference pour la regulation)
+# PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai (26 correspond a D0 sur wemos esp 32, 16 = D0 sur wemos D1 mini)
+# REGULATION = OFF : prise en compte ou non de la temperature pour piloter la chaudiere (si OFF seul le calendrier pilote la chaudiere)
+
+[bureau]
+WIFI_SSID = Livebox-xxxxxx
+WIFI_PWD = yyyyyyyyy
+IP_TEMP_INT = 192.168.1.44
+
+[maison]
+WIFI_SSID = Livebox-zzzzzzz
+WIFI_PWD = 564132164132065341
+IP_TEMP_INT = 192.168.1.27
+
+CONSIGNE = 19.50
+CHAUFFAGE = OFF
+ENV = maison
+PIN_RELAI = 16
+REGULATION = OFF

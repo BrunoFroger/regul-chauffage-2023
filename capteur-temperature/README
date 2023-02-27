@@ -1,0 +1,13 @@
+connectique
+
+afficheur :
+sda D2
+scl d1
+vcc 3,3v
+gnd gnd
+
+sonde temperature
+vcc 3,3
+gnd gnd
+signal A0
+
