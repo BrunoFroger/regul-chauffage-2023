@@ -232,6 +232,18 @@ bool getChauffageStatus(void){
 
 //----------------------------------------------
 //
+//      handleChargeCalendrier
+//
+//----------------------------------------------
+void handleChargeCalendrier(){
+    String datas;
+    Serial.print("recuperation du calendrier sauvegarde sur carte SD\n");
+    lireFichier("chaudiere/calendrier.txt", &datas);
+    Serial.println(datas);
+}
+
+//----------------------------------------------
+//
 //      handleSauveCalendrier
 //
 //----------------------------------------------
@@ -618,6 +630,7 @@ void pageCalendrier() {
     }
     page += "        <p><a href='/'>  retour </a></p>\n";
     page += "        <p><a href='/sauveCalendrier'>  sauvegarde du calendrier </a></p>\n";
+    page += "        <p><a href='/chargeCalendrier'>  recuperation du calendrier sauvegarde</a></p>\n";
     page += "    </div>\n";
     page +=      piedDePage;
 

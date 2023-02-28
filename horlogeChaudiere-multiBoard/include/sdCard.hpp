@@ -12,6 +12,7 @@
     extern bool sdcardInit(void);
     extern void handleConfig(void);
     extern void handleSauveConfig(void);
+    extern void handleSelectEnvironnement(void);
     extern void sauvegardeFichier(String filename, String datas);
     extern void lireFichier(String filename, void *datas);
     extern void handleListFichierConfiguration(void);

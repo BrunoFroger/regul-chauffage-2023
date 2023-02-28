@@ -47,6 +47,7 @@
     extern void handleDeletePlage(void);
     extern void handleCreatePlage(void);
     extern void handleSauveCalendrier(void);
+    extern void handleChargeCalendrier(void);
     extern void saveCalendrier(void);
     extern void loadCalendrier(void);
     extern structCalendrier *getCalendrier(void);
