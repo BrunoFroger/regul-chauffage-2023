@@ -263,7 +263,94 @@ void handleChargeCalendrier(){
     String datas;
     Serial.print("recuperation du calendrier sauvegarde sur carte SD\n");
     datas = lireFichier("chaudiere/calendrier.txt");
-    Serial.println(datas);
+    //Serial.println(datas);
+    Serial.print("datas.length() = "); Serial.println(datas.length());
+    String ligne = "";
+    int numLigne = 0;
+    int idx = 0;
+    int itemJour, itemPlage, itemModele;
+    char itemNomPlage[20];
+    int itemHeureDeb, itemMinuteDeb;
+    int itemHeureFin, itemMinuteFin, itemConsigne;
+    bool itemChauffageOnOff, itemPlageActive;
+    while(idx < datas.length()){
+        while (datas[idx] != '\n'){
+            ligne += datas[idx];
+            idx++;
+        }
+        idx++;
+        Serial.print(numLigne); Serial.print(" ligne = "); Serial.println(ligne);
+        plageHoraire plage;
+        int k = 0;
+        int numItem = 0;
+        String item = "";
+        //Serial.println(ligne.substring(0,4));
+        if (ligne.substring(0,4) != "jour"){
+            while (k < ligne.length()){
+                while ((ligne[k] != ';') && (k < ligne.length())){
+                    //Serial.print(ligne[k]);
+                    item += ligne[k++];
+                }
+                k++;
+                Serial.print(numItem); Serial.print(" item = "); Serial.println(item);
+                item = "";
+                numItem++;
+                switch(numItem){
+                    case 0: // jour
+                        itemJour = item.toInt();
+                        break;
+                    case 1: // num plage
+                        itemPlage = item.toInt();
+                        break;
+                    case 2: // modele
+                        itemModele = item.toInt();
+                        break;
+                    case 3: // nom
+                        strcpy(itemNomPlage, item.c_str());
+                        break;
+                    case 4: // heure debut
+                        itemHeureDeb = item.toInt();
+                        break;
+                    case 5: // minute debut
+                        itemMinuteDeb = item.toInt();
+                        break;
+                    case 6: // heure fin
+                        itemHeureFin = item.toInt();
+                        break;
+                    case 7: // minute fin
+                        itemMinuteFin = item.toInt();
+                        break;
+                    case 8: // chauffage on off
+                        if (item.toInt() == 0){
+                            itemChauffageOnOff = false;
+                        } else {
+                            itemChauffageOnOff = true;
+                        }
+                        break;
+                    case 9: // consigne
+                        itemConsigne = item.toInt();
+                        break;
+                    case 10: // plage active
+                        if (item.toInt() == 0){
+                            itemPlageActive = false;
+                        } else {
+                            itemPlageActive = true;
+                        }
+                        break;
+                }
+            }
+            setPlage(&calendrier.plagesHoraires[itemJour][itemPlage], 
+                itemModele, itemNomPlage, itemHeureDeb, itemMinuteDeb, 
+                itemHeureFin, itemMinuteFin, itemChauffageOnOff, 
+                itemConsigne, itemPlageActive);
+
+            if (numLigne >= 2) break;
+        }
+        ligne = "";
+        numLigne++;
+    }
+    server.sendHeader("Location", String("/calendrier"), true);
+    server.send ( 302, "text/plain", "");
 }
 
 //----------------------------------------------
@@ -669,7 +756,7 @@ void pageCalendrier() {
         page += "               <td align='center'>";
         page +=                     ptrModele->nomPlage;
         page += "               </td align='center'>";
-        page += "               <td>";
+        page += "               <td align='center'>";
         page +=                     ptrModele->heureDebut;
         page += "               </td>";
         page += "               <td align='center'>";
