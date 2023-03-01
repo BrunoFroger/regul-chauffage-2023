@@ -282,12 +282,15 @@ void sauvegardeFichier(String filename, String datas){
 //      lireFichier
 //
 //----------------------------------------------
-void lireFichier(String filename, void *datas){
+String lireFichier(String filename){
+    String datas = "";
+    char car;
     myFile = SD.open(filename);
     if (myFile){
         Serial.println("lecture de " + filename);
         while(myFile.available()){
-            myFile.readBytes((char*)datas++, 1);
+            car = myFile.read();
+            datas += car;
         }
         myFile.close();
     } else {
@@ -295,6 +298,7 @@ void lireFichier(String filename, void *datas){
         Serial.print(filename);
         Serial.println();
     }
+    return datas;
 }
 
 //----------------------------------------------
@@ -479,7 +483,7 @@ void handleConfig(void){
     page += "<body>\n";
     page += "   <h1> Configuration </h1>\n";
     page += "   <p>Cette page affiche les parametres contenus dans la carte SD\n";
-    page += "   <form action='/selectEnvironnement'>";
+    page += "   <p>Pour modifier l'environnement a utiliser ; il faut éditer le fichier de configuration sur la carte SD\n";
     page += "   <div>\n";
     page += "       <table>\n";
     page += "           <thead>\n";
@@ -498,24 +502,7 @@ void handleConfig(void){
     page += "               <tr>\n";
     page += "                   <td>Environnement utilise</td>\n";
     page += "                   <td>";
-    page += "                       <select name='environnement'>\n";
-    char ligne[80];
-    char nomEnv[20];
-    char selected[30];
-    for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
-        strcpy(nomEnv, listeEnvironnement[i].nom);
-        if (strcmp(nomEnv, "") != 0){
-            if (strcmp(nomEnv, environnement.c_str()) == 0){
-                sprintf(selected," selected='%s'");
-            } else {
-                strcpy(selected,"");
-            }
-            sprintf(ligne, "<option valeur='%s'%s>%s</option>\n", nomEnv, selected, nomEnv);
-            page += ligne;
-        } else {
-            break;
-        }
-    }
+    page +=                         environnement;
     page += "                       </select>";
     page += "                   </td>\n";
     page += "               <tr>\n";
@@ -547,9 +534,7 @@ void handleConfig(void){
     page += "           </tbody>\n";
     page += "       </table>\n";
     page += "       <div>\n";
-    page += "           <button>Valider</button>\n";
     page += "       </div>\n";
-    page += "       </form>";
     page += "    </div>\n";
 
     page += "   <p>liste des environnements definis\n";

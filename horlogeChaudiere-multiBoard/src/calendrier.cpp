@@ -20,11 +20,33 @@ int jourEnEdition, plageEnEdition;
 
 //----------------------------------------------
 //
+//      setPlage
+//
+//----------------------------------------------
+void setPlage(plageHoraire *ptrPlage, int8_t modele, char *nom, 
+    int8_t hDeb, int8_t mDeb, int8_t hFin, int8_t mFin, 
+    bool chauffage, int consigne, bool active){
+    
+    ptrPlage->modele = modele;
+    strcpy(ptrPlage->nomPlage, nom);
+    ptrPlage->heureDebut = hDeb;
+    ptrPlage->minuteDebut = mDeb;
+    ptrPlage->heureFin = hFin;
+    ptrPlage->minuteFin = mFin;
+    ptrPlage->chauffageOnOff = chauffage;
+    ptrPlage->consigne = consigne;
+    ptrPlage->plageActive = active;
+}
+
+//----------------------------------------------
+//
 //      setPlageNuit
 //
 //----------------------------------------------
 void setPlageNuit(plageHoraire *ptrPlage){
-    ptrPlage->modele = PLAGE_MODELE_NUIT;
+    setPlage(ptrPlage, PLAGE_MODELE_NUIT, "Nuit", 22, 30, 6, 30, true, consigneReferenceNuit, true);
+
+    /*ptrPlage->modele = PLAGE_MODELE_NUIT;
     strcpy(ptrPlage->nomPlage,"Nuit");
     ptrPlage->heureDebut = 22;
     ptrPlage->minuteDebut = 30;
@@ -32,7 +54,7 @@ void setPlageNuit(plageHoraire *ptrPlage){
     ptrPlage->minuteFin = 30;
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceNuit;
-    ptrPlage->plageActive = true;
+    ptrPlage->plageActive = true;*/
     //Serial.println("plage Nuit selectionnee 22:30 => 6:30");
 }
 
@@ -42,7 +64,9 @@ void setPlageNuit(plageHoraire *ptrPlage){
 //
 //----------------------------------------------
 void setPlageLever(plageHoraire *ptrPlage){
-    ptrPlage->modele = PLAGE_MODELE_LEVER;
+    setPlage(ptrPlage, PLAGE_MODELE_LEVER, "Lever", 6, 30, 8, 30, true, consigneReferenceJour, true);
+
+    /*ptrPlage->modele = PLAGE_MODELE_LEVER;
     strcpy(ptrPlage->nomPlage,"Lever");
     ptrPlage->heureDebut = 6;
     ptrPlage->minuteDebut = 30;
@@ -50,7 +74,7 @@ void setPlageLever(plageHoraire *ptrPlage){
     ptrPlage->minuteFin = 30;
     ptrPlage->chauffageOnOff = true;
     ptrPlage->consigne = consigneReferenceJour;
-    ptrPlage->plageActive = true;
+    ptrPlage->plageActive = true;*/
     //Serial.println("plage Lever selectionnee 6:30 => 8:30");
 }
 
@@ -121,8 +145,8 @@ void initCalendrier(void){
     Serial.print ("la taille du calendrier est : ");
     Serial.println(sizeof(calendrier));
 
-    if (0){
-        lireFichier("chaudiere/calendrier.dat", &calendrier);
+    if (1){
+        handleChargeCalendrier();
     } else {
         for (int j = 0 ; j < NB_JOURS ; j++){
             for (int i = 0 ; i < NB_PLAGES_PAR_JOUR - 1; i++){
@@ -238,7 +262,7 @@ bool getChauffageStatus(void){
 void handleChargeCalendrier(){
     String datas;
     Serial.print("recuperation du calendrier sauvegarde sur carte SD\n");
-    lireFichier("chaudiere/calendrier.txt", &datas);
+    datas = lireFichier("chaudiere/calendrier.txt");
     Serial.println(datas);
 }
 
@@ -618,6 +642,63 @@ void pageCalendrier() {
             }
         }
         page += "           </tr>\n";
+    }
+    page += "           </tbody>\n";
+    page += "       </table>\n";
+    page += "    </div>\n";
+    page += "    <div>\n";
+    page += "       <p>Les plages predefinies sont les suivantes</p>\n";
+    page += "       <table>\n";
+    page += "           <thead>\n";
+    page += "               <tr>\n";
+    page += "                   <th>nom</th>\n";
+    page += "                   <th>heure debut</th>\n";
+    page += "                   <th>minute debut</th>\n";
+    page += "                   <th>heure fin</th>\n";
+    page += "                   <th>minute fin</th>\n";
+    page += "                   <th>chauffage on/off</th>\n";
+    page += "                   <th>consigne</th>\n";
+    page += "                   <th>active</th>\n";
+    page += "               </tr>\n";
+    page += "           </thead>\n";
+    page += "           <tbody>\n";
+    plageHoraire *ptrModele;
+    for (int i = 0 ; i < NB_PLAGES_MODELE ; i ++){
+        ptrModele = &calendrier.plagesModeles[i];
+        page += "           <tr>";
+        page += "               <td align='center'>";
+        page +=                     ptrModele->nomPlage;
+        page += "               </td align='center'>";
+        page += "               <td>";
+        page +=                     ptrModele->heureDebut;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrModele->minuteDebut;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrModele->heureFin;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrModele->minuteFin;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        if (ptrModele->chauffageOnOff){
+            page += "               ON";
+        } else {
+            page += "               OFF";
+        }
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrModele->consigne;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        if (ptrModele->plageActive){
+            page += "               ON";
+        } else {
+            page += "               OFF";
+        }
+        page += "              </td>";
+        page += "           </tr>";
     }
     page += "           </tbody>\n";
     page += "       </table>\n";

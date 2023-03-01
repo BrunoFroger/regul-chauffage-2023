@@ -294,6 +294,9 @@ bool initWifi(void){
 
     Serial.println("initWifi => fin");
 
+    // 
+    //  Definition du pied de page
+    //
     piedDePage += "    <div class='w3-center w3-padding-16'>\n";
     piedDePage += "        <p>Ce serveur est hébergé sur un arduino (";
     piedDePage +=          BOARD;
@@ -303,6 +306,9 @@ bool initWifi(void){
     piedDePage +=          "</i>\n";
     piedDePage += "    </div>\n";
 
+    // 
+    //  Definition de l'entete de page
+    //
     enteteDePage += "    <div>";
     enteteDePage += "        <table>";
     enteteDePage += "            <tr>";
