@@ -145,7 +145,7 @@ void initCalendrier(void){
     Serial.print ("la taille du calendrier est : ");
     Serial.println(sizeof(calendrier));
 
-    if (1){
+    if (0){
         handleChargeCalendrier();
     } else {
         for (int j = 0 ; j < NB_JOURS ; j++){

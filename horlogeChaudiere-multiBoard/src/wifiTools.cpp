@@ -58,16 +58,6 @@ char *getWifiSsid(){
 
 //----------------------------------------------
 //
-//      setWifiParameters
-//
-//----------------------------------------------
-void setWifiParameters(char *ssid, char *pwd){
-    strcpy(wifiSsid, ssid);
-    strcpy(wifiPwd, pwd);
-}
-
-//----------------------------------------------
-//
 //      getIpAddress
 //
 //----------------------------------------------
@@ -195,18 +185,11 @@ void handleRoot() {
 
 //----------------------------------------------
 //
-//      initWifi
+//      connectWifi
 //
 //----------------------------------------------
-bool initWifi(void){
-
-    Serial.println("======================");
-    Serial.println("|     Init Wifi      |");
-    Serial.println("----------------------");
-    Serial.println("initWifi => debut");
-    strcpy(wifiSsid, localWifiSsid);
-    strcpy(wifiPwd, localWifiPwd);
-    WiFi.mode(WIFI_STA);
+bool connectWifi(void){    WiFi.mode(WIFI_STA);
+    Serial.println("connectWifi => debut");
     WiFi.disconnect();
     delay(100);
     //Serial.println("initWifi => check wifi status");
@@ -292,7 +275,25 @@ bool initWifi(void){
     server.on("/listFichierConfig", handleListFichierConfiguration);
     Serial.println("======================");
 
-    Serial.println("initWifi => fin");
+    Serial.println("connectWifi => fin");
+    return true;
+
+}
+
+//----------------------------------------------
+//
+//      initWifi
+//
+//----------------------------------------------
+bool initWifi(void){
+
+    Serial.println("======================");
+    Serial.println("|     Init Wifi      |");
+    Serial.println("----------------------");
+    Serial.println("initWifi => debut");
+    strcpy(wifiSsid, localWifiSsid);
+    strcpy(wifiPwd, localWifiPwd);
+    if (!connectWifi()) return false;
 
     // 
     //  Definition du pied de page
@@ -331,4 +332,17 @@ bool initWifi(void){
     enteteDePage += "        </table>";
     enteteDePage += "    </div>";
     return true;
+}
+
+//----------------------------------------------
+//
+//      setWifiParameters
+//
+//----------------------------------------------
+void setWifiParameters(char *ssid, char *pwd){
+    char ligne[100];
+    strcpy(wifiSsid, ssid);
+    strcpy(wifiPwd, pwd);
+    sprintf(ligne, "setWifiParameters : ssid = <%s> / pwd = <%s>\n", ssid, pwd); Serial.print(ligne);
+    connectWifi();
 }

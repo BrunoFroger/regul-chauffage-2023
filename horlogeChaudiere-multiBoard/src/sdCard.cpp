@@ -117,7 +117,7 @@ void initEnvironnement(String ligne){
 //
 //----------------------------------------------
 void setEnvironnement(String envName){
-    //Serial.println("setEnvironnement : nom de l'environemment => <" + envName + ">");
+    Serial.println("setEnvironnement : nom de l'environemment => <" + envName + ">");
     for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
         structEnvironnement *env = &listeEnvironnement[i];
         if (envName = env->nom){
@@ -145,6 +145,7 @@ void analyseLigne(String ligne){
         if (insideEnvironnement){
             //listeEnvironnements();
             insideEnvironnement = false;
+            setEnvironnement(environnement);
         }
         return;
     } 
@@ -177,7 +178,6 @@ void analyseLigne(String ligne){
         //Serial.print("Utilisation de l'environnement : <");
         //Serial.print(environnement);
         //Serial.println(">");
-        setEnvironnement(environnement);
     } else if (ligne.startsWith("WIFI_SSID")){
         // fixe le nom du ssid
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
