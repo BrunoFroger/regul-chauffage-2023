@@ -102,32 +102,34 @@ void refreshTemperatures(void){
     //Serial.println(tmp);
     if (tmp > delayRefreshTemperatures){
         lastRefreshTemperatures = millis();
-        char ligne[200];
-        char url[100];
-        sprintf(url, "http://%s%s", localIPCapteurTemperature, baseUrl);
-        http.begin(client, url);
-        //http.begin(client, IPcapteurTemperature, 80, baseUrl);
-        int httpCode = http.GET();
-        // httpCode will be negative on error
-        if (httpCode >= 0) {
-            // HTTP header has been send and Server response header has been handled
-            //sprintf(ligne, "[HTTP] GET %s => code:%d", url, httpCode); Serial.println(ligne);
-            char payload[50];
+        if (isWifiConnected()){
+            char ligne[200];
+            char url[100];
+            sprintf(url, "http://%s%s", localIPCapteurTemperature, baseUrl);
+            http.begin(client, url);
+            //http.begin(client, IPcapteurTemperature, 80, baseUrl);
+            int httpCode = http.GET();
+            // httpCode will be negative on error
+            if (httpCode >= 0) {
+                // HTTP header has been send and Server response header has been handled
+                //sprintf(ligne, "[HTTP] GET %s => code:%d", url, httpCode); Serial.println(ligne);
+                char payload[50];
 
-            strcpy(payload, http.getString().c_str());
-            //Serial.print("payload="); Serial.println(payload);
-            char * pch;
-            pch = strchr(payload, '=');
-            //Serial.print("temperature=<"); Serial.print(pch+1);Serial.println(">");
-            setTemperatureInterieure(atoi(pch+1));
+                strcpy(payload, http.getString().c_str());
+                //Serial.print("payload="); Serial.println(payload);
+                char * pch;
+                pch = strchr(payload, '=');
+                //Serial.print("temperature=<"); Serial.print(pch+1);Serial.println(">");
+                setTemperatureInterieure(atoi(pch+1));
 
-            //Serial.println(payload);
-        } else {
-            sprintf(ligne, "[HTTP] GET %s => failed:%s", url, http.errorToString(httpCode).c_str()); Serial.println(ligne);
+                //Serial.println(payload);
+            } else {
+                sprintf(ligne, "[HTTP] GET %s => failed:%s", url, http.errorToString(httpCode).c_str()); Serial.println(ligne);
+            }
+            http.end();
+            //Serial.print("fin refresh temperature\n");
+            //delay(1000);
         }
-        http.end();
-        //Serial.print("fin refresh temperature\n");
-        //delay(1000);
     }
 }
 

@@ -109,6 +109,7 @@ void initEnvironnement(String ligne){
         }
     }
     insideEnvironnement = true;
+    environnement = String(nomEnvironnement);
 }
 
 //----------------------------------------------
@@ -122,7 +123,6 @@ void setEnvironnement(String envName){
         structEnvironnement *env = &listeEnvironnement[i];
         if (envName = env->nom){
             setIPCapteurTemperature(env->ipTempInt);
-            setWifiParameters(env->wifiSsid, env->wifiPwd);
             return;
         }
     }
@@ -178,6 +178,13 @@ void analyseLigne(String ligne){
         //Serial.print("Utilisation de l'environnement : <");
         //Serial.print(environnement);
         //Serial.println(">");
+        for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
+            structEnvironnement *env = &listeEnvironnement[i];
+            if (environnement == String(env->nom)){
+                setWifiParameters(env->wifiSsid, env->wifiPwd);
+                break;
+            }
+        }
     } else if (ligne.startsWith("WIFI_SSID")){
         // fixe le nom du ssid
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];

@@ -70,7 +70,7 @@ void setup() {
     Serial.println("+                               +");
     if (!sdcardInit()) stop();
     if (!initWifi()) stop();
-    initNtp();
+    if (isWifiConnected()) initNtp();
     initCalendrier();
     initAfficheur();
     initTemperatures();
@@ -89,11 +89,11 @@ void setup() {
 void loop(){ 
 
     refreshAfficheur();
-    refreshNtp();
+    if (isWifiConnected()) refreshNtp();
     refreshChaudiere();
     if (getRegulationMode()){
         refreshTemperatures();
     }
-    handleWebRequete();
+    if (isWifiConnected()) handleWebRequete();
     delay(LOOP_DELAY);
 }

@@ -46,13 +46,23 @@ char ipLocale[50] = "";
 char ipGateway[50];
 String piedDePage = "";
 String enteteDePage = "";
+bool wifiConnected = false;
+
+//----------------------------------------------
+//
+//      isWifiConnected
+//
+//----------------------------------------------
+bool isWifiConnected(void){
+    return wifiConnected;
+}
 
 //----------------------------------------------
 //
 //      getWifiSsid
 //
 //----------------------------------------------
-char *getWifiSsid(){
+char *getWifiSsid(void){
     return wifiSsid;
 }
 
@@ -94,6 +104,7 @@ void deconnecteWifi(){
         //Serial.println("deconnecteWifi => OK");
     }
     //Serial.println("deconnecteWifi => fin");
+    wifiConnected = false;
 }
 
 //----------------------------------------------
@@ -197,6 +208,7 @@ bool connectWifi(void){    WiFi.mode(WIFI_STA);
         Serial.println("initWifi => ERROR : No shield detected !!");
         Serial.print("error code = ");
         Serial.println(WiFi.status());
+        wifiConnected = false;
         return false;
     }
     Serial.println("initWifi => a shield is detected");
@@ -234,6 +246,7 @@ bool connectWifi(void){    WiFi.mode(WIFI_STA);
         // on a  fait 20 tentatives
         // imposible de se connecter au wifi !
         Serial.println("\nWifi non connecte");
+        wifiConnected = false;
         return false;
     } else {
         // on a reussit a se connecter au wifi
@@ -276,6 +289,7 @@ bool connectWifi(void){    WiFi.mode(WIFI_STA);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");
+    wifiConnected = true;
     return true;
 
 }
@@ -291,8 +305,10 @@ bool initWifi(void){
     Serial.println("|     Init Wifi      |");
     Serial.println("----------------------");
     Serial.println("initWifi => debut");
-    strcpy(wifiSsid, localWifiSsid);
-    strcpy(wifiPwd, localWifiPwd);
+    if (strcmp(wifiSsid, "") == 0){
+        strcpy(wifiSsid, localWifiSsid);
+        strcpy(wifiPwd, localWifiPwd);
+    }
     if (!connectWifi()) return false;
 
     // 
@@ -344,5 +360,5 @@ void setWifiParameters(char *ssid, char *pwd){
     strcpy(wifiSsid, ssid);
     strcpy(wifiPwd, pwd);
     sprintf(ligne, "setWifiParameters : ssid = <%s> / pwd = <%s>\n", ssid, pwd); Serial.print(ligne);
-    connectWifi();
+    //connectWifi();
 }
