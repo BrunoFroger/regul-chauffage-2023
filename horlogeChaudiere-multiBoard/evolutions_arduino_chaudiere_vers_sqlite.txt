@@ -1,0 +1,34 @@
+evolutions arduino chaudiere vers sqlite
+creer une branche git pour sqlite
+
+nom de la base de données
+	chaudiere
+
+nom des tables
+	config
+	plages
+	environnements
+
+champs config
+	nom environnement selectionné
+	adresse ip capteur temperature interieure
+	adresse ip capteur temperature exterieure
+	adresse ip capteur temperature depart chaudiere
+	adresse ip capteur temperature retour chaudiere
+	regulation on/off
+	pin relai
+
+champs plages
+	nom
+	modele
+	heure debut
+	heure fin
+	minute debut
+	minute fin
+	consigne temp
+	activation
+
+champs environnement
+	nom
+	nom ssid
+	pwd ssid

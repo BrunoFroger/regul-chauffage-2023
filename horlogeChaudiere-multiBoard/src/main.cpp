@@ -38,7 +38,12 @@
 //
 //=================================================
 void stop(void){
-    while(1);
+    Serial.print("une des initialisations est KO ...... ");
+    Serial.println ("STOP");
+    while(1) {
+        delay(10000);
+        Serial.print(".");
+    } 
 }
 
 //=================================================

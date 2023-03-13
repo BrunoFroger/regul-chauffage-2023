@@ -103,8 +103,8 @@ void refreshTemperatures(void){
     if (tmp > delayRefreshTemperatures){
         lastRefreshTemperatures = millis();
         if (isWifiConnected()){
-            char ligne[200];
-            char url[100];
+            char ligne[300];
+            char url[200];
             sprintf(url, "http://%s%s", localIPCapteurTemperature, baseUrl);
             http.begin(client, url);
             //http.begin(client, IPcapteurTemperature, 80, baseUrl);
@@ -138,9 +138,9 @@ void refreshTemperatures(void){
 //      getTemperatureSring
 //
 //----------------------------------------------
-char tmp[10];
+char tmp[20];
 char *getTemperatureSring(int temperature){
-    sprintf(tmp,"%d.%d", temperature / 10, temperature % 10 );
+    sprintf(tmp,"%d.%d", (int)(temperature / 10), temperature % 10 );
     return tmp;
 }
 
