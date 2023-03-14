@@ -26,7 +26,7 @@ int jourEnEdition, plageEnEdition;
 void setPlage(plageHoraire *ptrPlage, int8_t modele, char *nom, 
     int8_t hDeb, int8_t mDeb, int8_t hFin, int8_t mFin, 
     bool chauffage, int consigne, bool active){
-    char ligne[200];
+    //char ligne[200];
     ptrPlage->modele = modele;
     strcpy(ptrPlage->nomPlage, nom);
     ptrPlage->heureDebut = hDeb;
@@ -36,10 +36,9 @@ void setPlage(plageHoraire *ptrPlage, int8_t modele, char *nom,
     ptrPlage->chauffageOnOff = chauffage;
     ptrPlage->consigne = consigne;
     ptrPlage->plageActive = active;
-    sprintf(ligne, "setPlage => modele=%d, nom=%s, hdeb=%d, mdeb=%d, hfin=%d, mfin=%d, chaufOnOff=%d, consigne=%d, active=%d\n",
-            ptrPlage->modele, ptrPlage->nomPlage, ptrPlage->heureDebut, ptrPlage->minuteDebut, ptrPlage->heureFin, ptrPlage->minuteFin,
-            ptrPlage->chauffageOnOff, ptrPlage->consigne, ptrPlage->plageActive);
-    Serial.print(ligne);
+    //sprintf(ligne, "setPlage => modele=%d, nom=%s, hdeb=%d, mdeb=%d, hfin=%d, mfin=%d, chaufOnOff=%d, consigne=%d, active=%d\n",
+    //        ptrPlage->modele, ptrPlage->nomPlage, ptrPlage->heureDebut, ptrPlage->minuteDebut, ptrPlage->heureFin, ptrPlage->minuteFin,
+    //        ptrPlage->chauffageOnOff, ptrPlage->consigne, ptrPlage->plageActive); Serial.print(ligne);
 }
 
 //----------------------------------------------
@@ -69,16 +68,6 @@ void setPlageLever(plageHoraire *ptrPlage){
 //----------------------------------------------
 void setPlageCoucher(plageHoraire *ptrPlage){
     setPlage(ptrPlage, PLAGE_MODELE_COUCHER, (char *)"Coucher", 21, 0, 23, 0, true, consigneReferenceJour, true);
-    // ptrPlage->modele = PLAGE_MODELE_COUCHER;
-    // strcpy(ptrPlage->nomPlage,"Coucher");
-    // ptrPlage->heureDebut = 21;
-    // ptrPlage->minuteDebut = 0;
-    // ptrPlage->heureFin = 23;
-    // ptrPlage->minuteFin = 0;
-    // ptrPlage->chauffageOnOff = true;
-    // ptrPlage->consigne = consigneReferenceJour;
-    // ptrPlage->plageActive = true;
-    //Serial.println("plage Coucher selectionnee 21:00 => 23:00");
 }
 
 //----------------------------------------------
@@ -88,16 +77,6 @@ void setPlageCoucher(plageHoraire *ptrPlage){
 //----------------------------------------------
 void setPlageAll(plageHoraire *ptrPlage){
     setPlage(ptrPlage, PLAGE_MODELE_ALL, (char *)"Entiere", 0, 0, 23, 59, true, consigneReferenceJour, true);
-    // ptrPlage->modele = PLAGE_MODELE_ALL;
-    // strcpy(ptrPlage->nomPlage,"Entiere");
-    // ptrPlage->heureDebut = 0;
-    // ptrPlage->minuteDebut = 0;
-    // ptrPlage->heureFin = 23;
-    // ptrPlage->minuteFin = 59;
-    // ptrPlage->chauffageOnOff = true;
-    // ptrPlage->consigne = consigneReferenceJour;
-    // ptrPlage->plageActive = false;
-    //Serial.println("plage 24H selectionnee 0:00 => 23:59");
 }
 
 //----------------------------------------------
@@ -107,16 +86,6 @@ void setPlageAll(plageHoraire *ptrPlage){
 //----------------------------------------------
 void setPlageJournee(plageHoraire *ptrPlage){
     setPlage(ptrPlage, PLAGE_MODELE_JOUNEE, (char *)"Journee", 8, 0, 19, 59, true, consigneReferenceJour, true);
-    // ptrPlage->modele = PLAGE_MODELE_JOUNEE;
-    // strcpy(ptrPlage->nomPlage,"Journee");
-    // ptrPlage->heureDebut = 8;
-    // ptrPlage->minuteDebut = 0;
-    // ptrPlage->heureFin = 19;
-    // ptrPlage->minuteFin = 59;
-    // ptrPlage->chauffageOnOff = true;
-    // ptrPlage->consigne = consigneReferenceJour;
-    // ptrPlage->plageActive = true;
-    //Serial.println("plage Journee selectionnee 8:00 => 20:00");
 }
 
 //----------------------------------------------
@@ -129,7 +98,7 @@ void chargeCalendrier(){
     Serial.print("recuperation du calendrier sauvegarde sur carte SD\n");
     datas = lireFichier("chaudiere/calendrier.txt");
     //Serial.println(datas);
-    Serial.print("datas.length() = "); Serial.println(datas.length());
+    //Serial.print("datas.length() = "); Serial.println(datas.length());
     String ligne = "";
     int numLigne = 0;
     unsigned int idx = 0;
@@ -144,12 +113,12 @@ void chargeCalendrier(){
             idx++;
         }
         idx++;
-        Serial.print(numLigne); Serial.print(" ligne = "); Serial.println(ligne);
+        //Serial.print(numLigne); Serial.print(" ligne = <"); Serial.print(ligne); Serial.println(">");
         plageHoraire plage;
         unsigned int k = 0;
         int numItem = 0;
         String item = "";
-        Serial.println(ligne.substring(0,4));
+        //Serial.println(ligne.substring(0,4));
         if (ligne.substring(0,4) != "jour"){
             while (k < ligne.length()){
                 while ((ligne[k] != ';') && (k < ligne.length())){
@@ -157,33 +126,39 @@ void chargeCalendrier(){
                     item += ligne[k++];
                 }
                 k++;
-                Serial.print(numItem); Serial.print(" item = "); Serial.println(item);
-                item = "";
-                numItem++;
+                //Serial.print(numItem); Serial.print(" item = <"); Serial.print(item); Serial.print("> : ");
                 switch(numItem){
                     case 0: // jour
                         itemJour = item.toInt();
+                        //Serial.print("itemJour = "); Serial.println(itemJour);
                         break;
                     case 1: // num plage
                         itemPlage = item.toInt();
+                        //Serial.print("itemPlage = "); Serial.println(itemPlage);
                         break;
                     case 2: // modele
                         itemModele = item.toInt();
+                        //Serial.print("itemModele = "); Serial.println(itemModele);
                         break;
                     case 3: // nom
                         strcpy(itemNomPlage, item.c_str());
+                        //Serial.print("itemNomPlage = "); Serial.println(itemNomPlage);
                         break;
                     case 4: // heure debut
                         itemHeureDeb = item.toInt();
+                        //Serial.print("itemHeureDeb = "); Serial.println(itemHeureDeb);
                         break;
                     case 5: // minute debut
                         itemMinuteDeb = item.toInt();
+                        //Serial.print("itemMinuteDeb = "); Serial.println(itemMinuteDeb);
                         break;
                     case 6: // heure fin
                         itemHeureFin = item.toInt();
+                        //Serial.print("itemHeureFin = "); Serial.println(itemHeureFin);
                         break;
                     case 7: // minute fin
                         itemMinuteFin = item.toInt();
+                        //Serial.print("itemMinuteFin = "); Serial.println(itemMinuteFin);
                         break;
                     case 8: // chauffage on off
                         if (item.toInt() == 0){
@@ -191,9 +166,11 @@ void chargeCalendrier(){
                         } else {
                             itemChauffageOnOff = true;
                         }
+                        //Serial.print("itemChauffageOnOff = "); Serial.println(itemChauffageOnOff);
                         break;
                     case 9: // consigne
                         itemConsigne = item.toInt();
+                        //Serial.print("itemConsigne = "); Serial.println(itemConsigne);
                         break;
                     case 10: // plage active
                         if (item.toInt() == 0){
@@ -201,15 +178,20 @@ void chargeCalendrier(){
                         } else {
                             itemPlageActive = true;
                         }
+                        //Serial.print("itemPlageActive = "); Serial.println(itemPlageActive);
                         break;
+                    default:
+                        Serial.print("numItem "); Serial.print(numItem); Serial.println(" inconnu");
                 }
+                item = "";
+                numItem++;
             }
-            setPlage(&calendrier.plagesHoraires[itemJour][itemPlage], 
+            setPlage(&(calendrier.plagesHoraires[itemJour][itemPlage]), 
                 itemModele, itemNomPlage, itemHeureDeb, itemMinuteDeb, 
                 itemHeureFin, itemMinuteFin, itemChauffageOnOff, 
                 itemConsigne, itemPlageActive);
 
-            //if (numLigne >= 2) break;
+            //if (numLigne >= 5) break; // pour debug
         }
         ligne = "";
         numLigne++;
@@ -228,6 +210,18 @@ void initCalendrier(void){
     Serial.println("initialisation des donnees calendrier");
     Serial.print ("la taille du calendrier est : ");
     Serial.println(sizeof(calendrier));
+
+    // plage modele NUIT
+    setPlageNuit(&calendrier.plagesModeles[PLAGE_MODELE_NUIT]);
+    // plage modele LEVER
+    setPlageLever(&calendrier.plagesModeles[PLAGE_MODELE_LEVER]);
+    // plage modele COUCHER
+    setPlageCoucher(&calendrier.plagesModeles[PLAGE_MODELE_COUCHER]);
+    // plage modele ALL
+    setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
+    // plage modele JOURNEE
+    setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
+    //Serial.print(listeDonneesCalendrier());
 
     if (1){
         chargeCalendrier();
@@ -253,18 +247,6 @@ void initCalendrier(void){
             calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].plageActive = true;
         }
     }
-
-    // plage modele NUIT
-    setPlageNuit(&calendrier.plagesModeles[PLAGE_MODELE_NUIT]);
-    // plage modele LEVER
-    setPlageLever(&calendrier.plagesModeles[PLAGE_MODELE_LEVER]);
-    // plage modele COUCHER
-    setPlageCoucher(&calendrier.plagesModeles[PLAGE_MODELE_COUCHER]);
-    // plage modele ALL
-    setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
-    // plage modele JOURNEE
-    setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
-    //Serial.print(listeDonneesCalendrier());
 }
 
 //----------------------------------------------

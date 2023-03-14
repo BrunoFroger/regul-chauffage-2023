@@ -167,17 +167,12 @@ void analyseLigne(String ligne){
         //Serial.println("traitement de la consigne");
         SdConsigne = tmpData.toInt();
         setConsigne(SdConsigne);
-
-        //Serial.print("consigne = ");
-        ///Serial.print(getConsigne());
-        //Serial.println();
+        //Serial.print("consigne = "); Serial.println(getConsigne());
     } else if (ligne.startsWith("ENV")){
         // fixe l'environnement a traiter
         //Serial.println("fixe l'environnement a traiter");
         environnement = tmpData;
-        //Serial.print("Utilisation de l'environnement : <");
-        //Serial.print(environnement);
-        //Serial.println(">");
+        //Serial.print("Utilisation de l'environnement : <"); Serial.print(environnement); Serial.println(">");
         for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
             structEnvironnement *env = &listeEnvironnement[i];
             if (environnement == String(env->nom)){
@@ -190,25 +185,19 @@ void analyseLigne(String ligne){
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         strcpy(env->wifiSsid, tmpData.c_str());
         //Serial.println("fixe nom du ssid");
-        //Serial.print("ssid = <");
-        //Serial.print(env->wifiSsid);
-        //Serial.println(">");
+        //Serial.print("ssid = <"); Serial.print(env->wifiSsid); Serial.println(">");
     } else if (ligne.startsWith("WIFI_PWD")){
         // fixe le nom du wifi Pwd
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         strcpy(env->wifiPwd, tmpData.c_str());
         //Serial.println("fixe nom du wifi Pwd");
-        //Serial.print("pwd = <");
-        //Serial.print(env->wifiPwd);
-        //Serial.println(">");
+        //Serial.print("pwd = <"); Serial.print(env->wifiPwd); Serial.println(">");
     } else if (ligne.startsWith("IP_TEMP_INT")){
         // fixe l'adresse du capteur de temperature
         structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
         strcpy(env->ipTempInt, tmpData.c_str());
         //Serial.println("fixe l'adresse du capteur de temperature");
-        //Serial.print("ip temp int = <");
-        //Serial.print(env->ipTempInt);
-        //Serial.println(">");
+        //Serial.print("ip temp int = <"); Serial.print(env->ipTempInt); Serial.println(">");
     } else if (ligne.startsWith("CHAUFFAGE")){
         // fixe l'activation ou non du chauffage
         if (tmpData == "ON"){
@@ -219,13 +208,11 @@ void analyseLigne(String ligne){
         setChauffageOnOff(SdChauffageOnOff);
     } else if (ligne.startsWith("PIN_RELAI")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
-        //Serial.print("AnalyseLigne : pinRelai = ");
-        //Serial.println(tmpData.toInt());
+        //Serial.print("AnalyseLigne : pinRelai = "); Serial.println(tmpData.toInt());
         setPinRelai(tmpData.toInt());
     } else if (ligne.startsWith("REGULATION")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
-        Serial.print("AnalyseLigne : regulation = ");
-        Serial.println(tmpData);
+        //Serial.print("AnalyseLigne : regulation = "); Serial.println(tmpData);
         if (tmpData == "ON"){
             setRegulation(true);
         } else {
@@ -272,11 +259,11 @@ void sauvegardeFichier(String filename, String datas){
     }
     myFile = SD.open(filename, FILE_WRITE);
     if (myFile){
-        Serial.println("sdCard => sauvegarde de " + filename);
+        //Serial.println("sdCard => sauvegarde de " + filename);
         myFile.print(datas);
         myFile.close();
-        Serial.print("sdCard => taille du fichier : ");
-        Serial.println(sizeof(datas));
+        //Serial.print("sdCard => taille du fichier : ");
+        //Serial.println(sizeof(datas));
     } else {
         Serial.print("impossible d'ouvrir le fichier ");
         Serial.print(filename);

@@ -61,8 +61,7 @@ void setRelai(bool etat){
 //
 //----------------------------------------------
 void setPinRelai(int pin){
-    Serial.print("nouvelle valeur de pin relai : ");
-    Serial.println(pin);
+    //Serial.print("nouvelle valeur de pin relai : "); Serial.println(pin);
     pinRelai = pin;
     pinMode(pinRelai, OUTPUT);
     setRelai(false);
