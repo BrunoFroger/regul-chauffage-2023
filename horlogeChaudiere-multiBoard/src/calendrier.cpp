@@ -17,6 +17,8 @@
 structCalendrier calendrier;
 bool chauffageCalendrier = false;
 int jourEnEdition, plageEnEdition;
+char filenameCalendrier[100] = "/chaudiere/calendrier.txt";
+char filenameConfig[100] = "/chaudiere/config.txt";
 
 //----------------------------------------------
 //
@@ -96,7 +98,7 @@ void setPlageJournee(plageHoraire *ptrPlage){
 void chargeCalendrier(){
     String datas;
     Serial.print("recuperation du calendrier sauvegarde sur carte SD\n");
-    datas = lireFichier("chaudiere/calendrier.txt");
+    datas = lireFichier(filenameCalendrier);
     //Serial.println(datas);
     //Serial.print("datas.length() = "); Serial.println(datas.length());
     String ligne = "";
@@ -370,7 +372,7 @@ void handleSauveCalendrier() {
         }
     }
     Serial.print(ligne);
-    sauvegardeFichier("chaudiere/calendrier.txt", ligne);
+    sauvegardeFichier(filenameCalendrier, ligne);
     server.sendHeader("Location", String("/calendrier"), true);
     server.send ( 302, "text/plain", "");
 }
