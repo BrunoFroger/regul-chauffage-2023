@@ -12,6 +12,7 @@
     #define NB_JOURS            7
     #define NB_PLAGES_PAR_JOUR  5
     #define NB_PLAGES_MODELE    5
+    #define NB_PLAGES_USER      5
 
     #define PLAGE_MODELE_NUIT       0
     #define PLAGE_MODELE_LEVER      1
@@ -34,6 +35,7 @@
     struct structCalendrier{
         plageHoraire plagesHoraires[NB_JOURS][NB_PLAGES_PAR_JOUR];
         plageHoraire plagesModeles[NB_PLAGES_MODELE];
+        plageHoraire plagesUtilisateur[NB_PLAGES_USER];
     };
 
     extern structCalendrier calendrier;
