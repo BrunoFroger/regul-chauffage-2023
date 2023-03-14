@@ -225,6 +225,10 @@ void initCalendrier(void){
     setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
     //Serial.print(listeDonneesCalendrier());
 
+    for (int i = 0 ; i < NB_PLAGES_USER ; i++){
+        setPlage(&calendrier.plagesUtilisateur[i],-1,(char*)"",-1,-1,-1,-1,0,-1,0);
+    }
+
     if (1){
         chargeCalendrier();
     } else {
@@ -760,6 +764,44 @@ void pageCalendrier() {
         page += "               </td>";
         page += "               <td align='center'>";
         if (ptrModele->plageActive){
+            page += "               ON";
+        } else {
+            page += "               OFF";
+        }
+        page += "              </td>";
+        page += "           </tr>";
+    }
+    plageHoraire *ptrPLageUser;
+    for (int i = 0 ; i < NB_PLAGES_USER ; i ++){
+        ptrPLageUser = &calendrier.plagesUtilisateur[i];
+        page += "           <tr>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->nomPlage;
+        page += "               </td align='center'>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->heureDebut;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->minuteDebut;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->heureFin;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->minuteFin;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        if (ptrPLageUser->chauffageOnOff){
+            page += "               ON";
+        } else {
+            page += "               OFF";
+        }
+        page += "               </td>";
+        page += "               <td align='center'>";
+        page +=                     ptrPLageUser->consigne;
+        page += "               </td>";
+        page += "               <td align='center'>";
+        if (ptrPLageUser->plageActive){
             page += "               ON";
         } else {
             page += "               OFF";
