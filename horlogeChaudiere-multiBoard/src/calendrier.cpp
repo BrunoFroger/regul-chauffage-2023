@@ -226,7 +226,9 @@ void initCalendrier(void){
     //Serial.print(listeDonneesCalendrier());
 
     for (int i = 0 ; i < NB_PLAGES_USER ; i++){
-        setPlage(&calendrier.plagesUtilisateur[i],-1,(char*)"",-1,-1,-1,-1,0,-1,0);
+        char nomPlage[20];
+        sprintf(nomPlage, "user_%d", i);
+        setPlage(&calendrier.plagesUtilisateur[i],-1,nomPlage,-1,-1,-1,-1,0,-1,0);
     }
 
     if (1){
@@ -619,6 +621,7 @@ void handleEditHeurePlage() {
 //
 //----------------------------------------------
 void pageCalendrier() {
+    char ligne[200];
     Serial.println("affichage page calendrier");
     String page = "<!DOCTYPE html>\n";
     page += "<style type=\"text/css\">\n";
@@ -678,7 +681,6 @@ void pageCalendrier() {
         page +=                     getDayString(j);
         page += "               </td>\n";
         char heurePlage[20];
-        char ligne[200];
         for (int i = 0 ; i < NB_PLAGES_PAR_JOUR ; i++){
             if (calendrier.plagesHoraires[j][i].heureDebut != -1){
                 page += "       <td align='center'> ";
@@ -778,35 +780,42 @@ void pageCalendrier() {
         page += "               <td align='center'>";
         page +=                     ptrPLageUser->nomPlage;
         page += "               </td align='center'>";
-        page += "               <td align='center'>";
-        page +=                     ptrPLageUser->heureDebut;
-        page += "               </td>";
-        page += "               <td align='center'>";
-        page +=                     ptrPLageUser->minuteDebut;
-        page += "               </td>";
-        page += "               <td align='center'>";
-        page +=                     ptrPLageUser->heureFin;
-        page += "               </td>";
-        page += "               <td align='center'>";
-        page +=                     ptrPLageUser->minuteFin;
-        page += "               </td>";
-        page += "               <td align='center'>";
-        if (ptrPLageUser->chauffageOnOff){
-            page += "               ON";
+        if (calendrier.plagesUtilisateur[i].heureDebut != -1){
+            page += "           <td align='center'>";
+            page +=                 ptrPLageUser->heureDebut;
+            page += "           </td>";
+            page += "           <td align='center'>";
+            page +=                 ptrPLageUser->minuteDebut;
+            page += "           </td>";
+            page += "           <td align='center'>";
+            page +=                 ptrPLageUser->heureFin;
+            page += "           </td>";
+            page += "           <td align='center'>";
+            page +=                 ptrPLageUser->minuteFin;
+            page += "           </td>";
+            page += "           <td align='center'>";
+            if (ptrPLageUser->chauffageOnOff){
+                page += "           ON";
+            } else {
+                page += "           OFF";
+            }
+            page += "           </td>";
+            page += "           <td align='center'>";
+            page +=                 ptrPLageUser->consigne;
+            page += "           </td>";
+            page += "           <td align='center'>";
+            if (ptrPLageUser->plageActive){
+                page += "           ON";
+            } else {
+                page += "           OFF";
+            }
+            page += "           </td>";
         } else {
-            page += "               OFF";
-        }
-        page += "               </td>";
-        page += "               <td align='center'>";
-        page +=                     ptrPLageUser->consigne;
-        page += "               </td>";
-        page += "               <td align='center'>";
-        if (ptrPLageUser->plageActive){
-            page += "               ON";
-        } else {
-            page += "               OFF";
-        }
-        page += "              </td>";
+                page += "       <td colspan='7' align='center'>";
+                sprintf(ligne, "<a href='/editPlageUser?plage=%d'> inactive </a>", i);
+                page +=         ligne;
+                page += "       </td>";
+            }
         page += "           </tr>";
     }
     page += "           </tbody>\n";
