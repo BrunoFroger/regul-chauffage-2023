@@ -159,7 +159,7 @@ void handleRoot() {
     page += enteteDePage;
     page += "    <title> Gestion chauffage </title>\n";
     page += "    <meta charset='UTF-8'/>\n";
-    page += "    <meta http-equiv='refresh' content='60'> ";
+    //page += "    <meta http-equiv='refresh' content='60'> ";
     page += "</head>\n";
 
     page += "<body>\n";

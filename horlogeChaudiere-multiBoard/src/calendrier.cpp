@@ -406,6 +406,25 @@ void handleDeletePlage() {
 
 //----------------------------------------------
 //
+//      handleDeletePlageUser
+//
+//----------------------------------------------
+void handleDeletePlageUser() {
+    Serial.print("suppression de la plage user ");
+    Serial.print(plageEnEdition);
+    calendrier.plagesUtilisateur[plageEnEdition].heureDebut = -1;
+    calendrier.plagesUtilisateur[plageEnEdition].minuteDebut = -1;
+    calendrier.plagesUtilisateur[plageEnEdition].heureFin = -1;
+    calendrier.plagesUtilisateur[plageEnEdition].minuteFin = -1;
+    calendrier.plagesUtilisateur[plageEnEdition].chauffageOnOff = false;
+    calendrier.plagesUtilisateur[plageEnEdition].consigne = -1;
+    calendrier.plagesUtilisateur[plageEnEdition].plageActive = false;
+    server.sendHeader("Location", String("/calendrier"), true);
+    server.send ( 302, "text/plain", "");
+}
+
+//----------------------------------------------
+//
 //      handleCreatePlage
 //
 //----------------------------------------------
@@ -543,6 +562,7 @@ void handleEditHeurePlage() {
     page += "   <title> EDITION D'UN HORAIRE DE PLAGE </title>\n";
     page += "   <meta charset='UTF-8'/>\n";
     page += "</head>\n";
+    page += enteteDePage;
     page += "<body>\n";
     page += "   <h1> EDITION D'UN HORAIRE DE PLAGE </h1>\n";
     page += "   <p> modification de la plage ";
@@ -589,6 +609,11 @@ void handleEditHeurePlage() {
     page += "                               <option valeur='coucher'>coucher</option>";
     page += "                               <option valeur='all'>24h</option>";
     page += "                               <option valeur='journee'>journee</option>";
+    page += "                               <option valeur='user_0'>user_0</option>";
+    page += "                               <option valeur='user_1'>user_1</option>";
+    page += "                               <option valeur='user_2'>user_2</option>";
+    page += "                               <option valeur='user_3'>user_3</option>";
+    page += "                               <option valeur='user_4'>user_4</option>";
     page += "                           </select>";
     page += "                       </td>";
     page += "                   </tr>";
@@ -778,7 +803,8 @@ void pageCalendrier() {
         ptrPLageUser = &calendrier.plagesUtilisateur[i];
         page += "           <tr>";
         page += "               <td align='center'>";
-        page +=                     ptrPLageUser->nomPlage;
+        sprintf(ligne, "<a href='/editPlageUser?plage=%d'> %s </a>", i, ptrPLageUser->nomPlage);
+        page +=                     ligne;
         page += "               </td align='center'>";
         if (calendrier.plagesUtilisateur[i].heureDebut != -1){
             page += "           <td align='center'>";
@@ -812,8 +838,7 @@ void pageCalendrier() {
             page += "           </td>";
         } else {
                 page += "       <td colspan='7' align='center'>";
-                sprintf(ligne, "<a href='/editPlageUser?plage=%d'> inactive </a>", i);
-                page +=         ligne;
+                page += "           inactive";
                 page += "       </td>";
             }
         page += "           </tr>";
