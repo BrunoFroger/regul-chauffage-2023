@@ -16,12 +16,13 @@
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
 // LOLIN Micro SD Shield V1.2.0: D4 (Default)
+// Feather ESP32 HUZZAH : ?? (Default)
 #ifdef lolin_s2_mini
     const int chipSelect = D4;
 #elif wemos_d1_mini32 
     const int chipSelect = D8;
 #elif adafruit_feather_m0 
-    const int chipSelect = D8;
+    const int chipSelect = 5;
 #else 
     #error Unsupported board selection.
 #endif
@@ -406,7 +407,11 @@ bool sdcardInit(void){
     }
     //listeEnvironnements();
 
+#ifdef lolin_s2_mini
     if (!SD.begin(chipSelect)) {
+# else 
+    if (!SD.begin()) {
+# endif
         Serial.println("initialization failed!");
         return false;
     }
