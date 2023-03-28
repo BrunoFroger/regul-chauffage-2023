@@ -249,27 +249,14 @@ bool connectWifi(void){
     Serial.println("connectWifi => debut");
     WiFi.onEvent(onWiFiEvent);
     if (strcmp(wifiMode, "AP") == 0){
+        Serial.println("Initialisation du mode Acces Point");
         WiFi.mode(WIFI_AP);
     } else {
+        Serial.println("Initialisation du mode Station");
         WiFi.mode(WIFI_STA);
     }
-    WiFi.disconnect();
-    delay(100);
-    //Serial.println("initWifi => check wifi status");
-    if (WiFi.status() == WL_NO_SHIELD){
-        Serial.println("initWifi => ERROR : No shield detected !!");
-        Serial.print("error code = ");
-        Serial.println(WiFi.status());
-        wifiConnected = false;
-        return false;
-    }
-    Serial.println("initWifi => a shield is detected");
-    delay(1000);
-    deconnecteWifi();
-    delay(1000);
-    cptTryWifi = 0;
+
     if (strcmp(wifiMode, "AP") == 0){
-        Serial.println("Initialisation du mode Acces Point");
         delay(500);
         IPAddress apLocalIp(192,168,10,1);
         IPAddress apGateway(192,168,10,0);
@@ -281,7 +268,21 @@ bool connectWifi(void){
         sprintf(ipLocale,"LocalIp = %d.%d.%d.%d",apLocalIp[0],apLocalIp[1],apLocalIp[2],apLocalIp[3]); Serial.println(ipLocale);
         sprintf(netMask,"netmask = %d.%d.%d.%d",apSubnetMask[0],apSubnetMask[1],apSubnetMask[2],apSubnetMask[3]); Serial.println(netMask);
     } else {
-        Serial.println("Initialisation du mode Station");
+        WiFi.disconnect();
+        delay(100);
+        //Serial.println("initWifi => check wifi status");
+        if (WiFi.status() == WL_NO_SHIELD){
+            Serial.println("initWifi => ERROR : No shield detected !!");
+            Serial.print("error code = ");
+            Serial.println(WiFi.status());
+            wifiConnected = false;
+            return false;
+        }
+        Serial.println("initWifi => a shield is detected");
+        delay(1000);
+        deconnecteWifi();
+        delay(1000);
+        cptTryWifi = 0;
         // Connect to WiFi network
         Serial.print("Connecting to ");
         Serial.println(wifiSsid);
