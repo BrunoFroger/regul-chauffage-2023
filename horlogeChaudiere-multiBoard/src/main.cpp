@@ -80,6 +80,12 @@ void setup() {
     initAfficheur();
     initTemperatures();
     initChaudiere();
+    Serial.print("handleWebRequete : ");
+    if (isWifiConnected() || isApMode()){
+        Serial.println("OK");
+    } else {
+        Serial.println("NOK");
+    }
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");
@@ -99,6 +105,8 @@ void loop(){
     if (getRegulationMode()){
         refreshTemperatures();
     }
-    if (isWifiConnected()) handleWebRequete();
+    if (isWifiConnected() || isApMode()){
+        handleWebRequete();
+    }
     delay(LOOP_DELAY);
 }

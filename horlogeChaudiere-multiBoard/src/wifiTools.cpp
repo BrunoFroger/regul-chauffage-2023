@@ -40,10 +40,12 @@
 
 char wifiSsid[50];
 char wifiPwd[50];
+char wifiMode[10];
 
 int cptTryWifi = 0;
 char ipLocale[50] = "";
 char ipGateway[50];
+char netMask[50];
 String piedDePage = "";
 String enteteDePage = "";
 bool wifiConnected = false;
@@ -74,6 +76,27 @@ char *getWifiSsid(void){
 char *getIpAddress(){
     if (strlen(ipLocale) == 0) return (char *)"non connecte";
     return ipLocale;
+}
+
+//----------------------------------------------
+//
+//      isApMode
+//
+//----------------------------------------------
+bool isApMode(){
+    if (strcmp(wifiMode, "AP") == 0)
+        return true;
+    else
+        return false;
+}
+
+//----------------------------------------------
+//
+//      getRSSI
+//
+//----------------------------------------------
+int getRSSI(){
+    return WiFi.RSSI();
 }
 
 //----------------------------------------------
@@ -184,6 +207,9 @@ void handleRoot() {
     page += "        <p>l'arduino capteur de temperature est a l'adresse : ";
     page +=          getIPCapteurTemperature();
     page += "        </p>\n";
+    page += "        <p>Qualité du signal Wifi (RSSI) : ";
+    page +=          getRSSI();
+    page += "        db</p>\n";
     page += "    </div>\n";
     page +=      piedDePage;
 
@@ -196,11 +222,37 @@ void handleRoot() {
 
 //----------------------------------------------
 //
+//      onWiFiEvent
+//
+//----------------------------------------------
+void onWiFiEvent(WiFiEvent_t event){
+    switch (event)
+    {
+    case SYSTEM_EVENT_AP_STACONNECTED:
+        Serial.println("Station connected to ESP32 soft AP");
+        break;
+    case SYSTEM_EVENT_AP_STADISCONNECTED:
+        Serial.println("Station disconnected to ESP32 soft AP");
+        break;
+    
+    default:
+        break;
+    }
+}
+
+//----------------------------------------------
+//
 //      connectWifi
 //
 //----------------------------------------------
-bool connectWifi(void){    WiFi.mode(WIFI_STA);
+bool connectWifi(void){
     Serial.println("connectWifi => debut");
+    WiFi.onEvent(onWiFiEvent);
+    if (strcmp(wifiMode, "AP") == 0){
+        WiFi.mode(WIFI_AP);
+    } else {
+        WiFi.mode(WIFI_STA);
+    }
     WiFi.disconnect();
     delay(100);
     //Serial.println("initWifi => check wifi status");
@@ -216,52 +268,65 @@ bool connectWifi(void){    WiFi.mode(WIFI_STA);
     deconnecteWifi();
     delay(1000);
     cptTryWifi = 0;
-    
-    // Connect to WiFi network
-    Serial.print("Connecting to ");
-    Serial.println(wifiSsid);
-    WiFi.mode(WIFI_STA);
-    delay(100);
-    WiFi.begin(wifiSsid, wifiPwd);
-    int cpt=0;
-    int cpt2=0;
-    int connected = WiFi.status() != WL_CONNECTED;
-    while (connected) {  //Attente de la connexion
+    if (strcmp(wifiMode, "AP") == 0){
+        Serial.println("Initialisation du mode Acces Point");
         delay(500);
-        //sprintf(buffer,"ssid = %s, pwd = %s", mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd); Serial.println(buffer);
-        //Serial.print("wifiStatus = "); Serial.println(connected);
-        //WiFi.begin(mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd);
-        Serial.print(".");   //Typiquement 5 à 10 points avant la connexion
-        if (cpt++ >= 10){
-            Serial.println();
-            cpt=0;
-        }
-        if (cpt2++ > 20){
-            break;
-        }
-        connected = WiFi.status() != WL_CONNECTED;
-    }
-
-    if (cpt2 > 20){
-        // on a  fait 20 tentatives
-        // imposible de se connecter au wifi !
-        Serial.println("\nWifi non connecte");
-        wifiConnected = false;
-        return false;
+        IPAddress apLocalIp(192,168,10,1);
+        IPAddress apGateway(192,168,10,0);
+        IPAddress apSubnetMask(255,255,255,0);
+        WiFi.softAPConfig(apLocalIp, apGateway, apSubnetMask);
+        WiFi.softAP(wifiSsid, wifiPwd);
+        delay(1000);
+        sprintf(ipGateway,"gateway = %d.%d.%d.%d",apGateway[0],apGateway[1],apGateway[2],apGateway[3]); Serial.println(ipGateway);
+        sprintf(ipLocale,"LocalIp = %d.%d.%d.%d",apLocalIp[0],apLocalIp[1],apLocalIp[2],apLocalIp[3]); Serial.println(ipLocale);
+        sprintf(netMask,"netmask = %d.%d.%d.%d",apSubnetMask[0],apSubnetMask[1],apSubnetMask[2],apSubnetMask[3]); Serial.println(netMask);
     } else {
-        // on a reussit a se connecter au wifi
-        Serial.println("");
-        Serial.println("WiFi connecte");
+        Serial.println("Initialisation du mode Station");
+        // Connect to WiFi network
+        Serial.print("Connecting to ");
+        Serial.println(wifiSsid);
+        delay(100);
+        WiFi.begin(wifiSsid, wifiPwd);
+        int cpt=0;
+        int cpt2=0;
+        int connected = WiFi.status() != WL_CONNECTED;
+        while (connected) {  //Attente de la connexion
+            delay(500);
+            //sprintf(buffer,"ssid = %s, pwd = %s", mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd); Serial.println(buffer);
+            //Serial.print("wifiStatus = "); Serial.println(connected);
+            //WiFi.begin(mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd);
+            Serial.print(".");   //Typiquement 5 à 10 points avant la connexion
+            if (cpt++ >= 10){
+                Serial.println();
+                cpt=0;
+            }
+            if (cpt2++ > 20){
+                break;
+            }
+            connected = WiFi.status() != WL_CONNECTED;
+        }
+        if (cpt2 > 20){
+            // on a  fait 20 tentatives
+            // imposible de se connecter au wifi !
+            Serial.println("\nWifi non connecte");
+            wifiConnected = false;
+            return false;
+        } else {
+            // on a reussit a se connecter au wifi
+            Serial.println("");
+            Serial.println("WiFi connecte");
+        }
+        // Print the IP address
+        Serial.print("ip locale = ");
+        IPAddress tmpIp = WiFi.localIP();
+        sprintf(ipLocale,"%d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipLocale);
+
+        //IPAddress gatewayIp = WiFi.gatewayIP();
+        tmpIp = WiFi.gatewayIP();
+        sprintf(ipGateway,"gateway = %d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipGateway);
+        Serial.println((String)"RSSI = " + WiFi.RSSI() + " db");
+        wifiConnected = true;
     }
-
-    // Print the IP address
-    Serial.print("ip locale = ");
-    IPAddress tmpIp = WiFi.localIP();
-    sprintf(ipLocale,"%d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipLocale);
-
-    //IPAddress gatewayIp = WiFi.gatewayIP();
-    tmpIp = WiFi.gatewayIP();
-    sprintf(ipGateway,"gateway = %d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipGateway);
 
     server.begin();
     server.onNotFound(handlePageNotFound);
@@ -291,7 +356,6 @@ bool connectWifi(void){    WiFi.mode(WIFI_STA);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");
-    wifiConnected = true;
     return true;
 
 }
@@ -307,9 +371,11 @@ bool initWifi(void){
     Serial.println("|     Init Wifi      |");
     Serial.println("----------------------");
     Serial.println("initWifi => debut");
+    //Serial.println("Connexion en mode : " + String(wifiMode));
     if (strcmp(wifiSsid, "") == 0){
         strcpy(wifiSsid, localWifiSsid);
         strcpy(wifiPwd, localWifiPwd);
+        strcpy(wifiMode, "STATION");
     }
     if (!connectWifi()) return false;
 
@@ -357,10 +423,11 @@ bool initWifi(void){
 //      setWifiParameters
 //
 //----------------------------------------------
-void setWifiParameters(char *ssid, char *pwd){
+void setWifiParameters(char *ssid, char *pwd, char *mode){
     char ligne[100];
     strcpy(wifiSsid, ssid);
     strcpy(wifiPwd, pwd);
-    sprintf(ligne, "setWifiParameters : ssid = <%s> / pwd = <%s>\n", ssid, pwd); Serial.print(ligne);
+    strcpy(wifiMode, mode);
+    sprintf(ligne, "setWifiParameters : ssid = <%s> / pwd = <%s> / mode = <%s>\n", ssid, pwd, mode); Serial.print(ligne);
     //connectWifi();
 }

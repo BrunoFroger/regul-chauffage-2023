@@ -23,13 +23,14 @@ voici un exemple de fichier de configuration
 # Les paramètres disponibles sont listés ci dessous 
 # avec la valeur par defaut s'ils ne sont pas renseignés
 
-Parametres generaux :
-# CONSIGNE = 200 : consigne de temperature a maintenir 20,0°
+# Parametres generaux :
+# CONSIGNE = 200 : consigne de temperature a maintenir 20,0° (exprime en 1/10 de degre)
 # CHAUFFAGE = OFF : determine si le chauffage est active ou non lors du demarrage du systeme
-# ENV = maison : definition de l'environnement a utiliser
+# WIFI_MODE = STATION ou AP ; defini le mode wifi(STATION = connexion a un reseau wifi) (AP = definition d'un poiint d'accès local)
+# ENV = maison : definition de l'environnement a utiliser en mode wifi
 # PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai
 
-Parametres d'environnement :
+# Parametres d'environnement en mode STATION:
 # [NOM_ENV] => liste de definitions de données specifiques a un environnement jusqu'a une ligne vide
 # WIFI_SSID = ssid : nom du point d'accces wifi
 # WIFI_PWD = passwd : passwd du point d'acces wifi
@@ -37,18 +38,34 @@ Parametres d'environnement :
 # PIN_RELAI = pinNumber : definition de la broche de l'arduino sur laquelle est connectee le relai (26 correspond a D0 sur wemos esp 32, 16 = D0 sur wemos D1 mini)
 # REGULATION = OFF : prise en compte ou non de la temperature pour piloter la chaudiere (si OFF seul le calendrier pilote la chaudiere)
 
+# parametres environnement en mode point d'accès
+# [AP] => definition des parametres du point d'accès local jusqu'a une ligne vide
+# WIFI_SSID = ssid : nom du point d'accces wifi
+# WIFI_PWD = passwd : passwd du point d'acces wifi
+
 [bureau]
-WIFI_SSID = Livebox-xxxxxx
-WIFI_PWD = yyyyyyyyy
+WIFI_SSID = Livebox-yyyyyyy
+WIFI_PWD = yyyyyyyyyy
 IP_TEMP_INT = 192.168.1.44
 
 [maison]
-WIFI_SSID = Livebox-zzzzzzz
-WIFI_PWD = 564132164132065341
+WIFI_SSID = Livebox-zzzz
+WIFI_PWD = zzzzzzzzzzz
 IP_TEMP_INT = 192.168.1.27
 
-CONSIGNE = 19.50
+[tp_link]
+WIFI_SSID = TP-LINK_88E2
+WIFI_PWD = xxxxxxxx
+IP_TEMP_INT = 192.168.1.27
+
+[AP]
+WIFI_SSID = Chaudiere
+WIFI_PWD = ppppppppp
+IP_TEMP_INT = 192.168.1.27
+
+CONSIGNE = 195
 CHAUFFAGE = OFF
-ENV = maison
+WIFI_MODE = STATION
+ENV = bureau
 PIN_RELAI = 16
 REGULATION = OFF

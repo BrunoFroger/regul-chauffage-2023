@@ -38,6 +38,7 @@ int SdConsigne;
 
 struct structEnvironnement{
     int index;
+    char wifiMode[10];   // AP : Accespoint ; STATION : connection a un reseau Wifi
     char nom[20];
     char wifiSsid[20];
     char wifiPwd[25];
@@ -73,17 +74,17 @@ String getValeur(String ligne){
 //----------------------------------------------
 void listeEnvironnements(void){
     char ligne[100];
-    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
-    Serial.print("| idx |   nom     |      ssid            |     pwd              |   ip capt temp    |\n");
-    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
+    Serial.print("+-----+-----------+-----------+----------------------+----------------------+-------------------+\n");
+    Serial.print("| idx |   nom     | Wifi Mode |      ssid            |     pwd              |   ip capt temp    |\n");
+    Serial.print("+-----+-----------+-----------+----------------------+----------------------+-------------------+\n");
     for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
         if (strcmp(listeEnvironnement[i].nom, "") != 0){
             structEnvironnement *env = &listeEnvironnement[i];
-            sprintf(ligne, "|  %d  |%10s | %20s | %20s | %17s |\n", i, env->nom, env->wifiSsid, env->wifiPwd, env->ipTempInt);
+            sprintf(ligne, "|  %d  |%10s |%10s | %20s | %20s | %17s |\n", i, env->nom, env->wifiMode, env->wifiSsid, env->wifiPwd, env->ipTempInt);
             Serial.print(ligne);
         }
     }
-    Serial.print("+-----+-----------+----------------------+----------------------+-------------------+\n");
+    Serial.print("+-----+-----------+-----------+----------------------+----------------------+-------------------+\n");
 }
 
 //----------------------------------------------
@@ -102,6 +103,11 @@ void initEnvironnement(String ligne){
             structEnvironnement *env = &listeEnvironnement[i];
             env->index = i;
             strcpy(env->nom, nomEnvironnement);
+            if (strcmp(nomEnvironnement, "AP") == 0){
+                strcpy(env->wifiMode, nomEnvironnement);
+            } else {
+                strcpy(env->wifiMode, "STATION");
+            }
             strcpy(env->wifiSsid, "");
             strcpy(env->wifiPwd, "");
             strcpy(env->ipTempInt, "");
@@ -177,7 +183,7 @@ void analyseLigne(String ligne){
         for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
             structEnvironnement *env = &listeEnvironnement[i];
             if (environnement == String(env->nom)){
-                setWifiParameters(env->wifiSsid, env->wifiPwd);
+                setWifiParameters(env->wifiSsid, env->wifiPwd, env->wifiMode);
                 break;
             }
         }
@@ -212,12 +218,17 @@ void analyseLigne(String ligne){
         //Serial.print("AnalyseLigne : pinRelai = "); Serial.println(tmpData.toInt());
         setPinRelai(tmpData.toInt());
     } else if (ligne.startsWith("REGULATION")){
-        // fixe la broche sur laquelle est connectee le relai de pilotage
-        //Serial.print("AnalyseLigne : regulation = "); Serial.println(tmpData);
         if (tmpData == "ON"){
             setRegulation(true);
         } else {
             setRegulation(false);
+        }
+    } else if (ligne.startsWith("WIFI_MODE")){
+        structEnvironnement *env = &listeEnvironnement[indexEnvironnementCourant];
+        if ((tmpData == "STATION") || (tmpData == "AP") ){
+            strcpy(env->wifiMode, tmpData.c_str());
+        } else {
+            Serial.println("ERREUR : mode wifi " + tmpData + " indefini (STATION ou AP)");
         }
     } else {
         Serial.print("ligne invalide : ");
