@@ -16,7 +16,7 @@
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
 // LOLIN Micro SD Shield V1.2.0: D4 (Default)
-// Feather ESP32 HUZZAH : ?? (Default)
+// Feather ESP32 HUZZAH : ?? 
 #ifdef lolin_s2_mini
     const int chipSelect = D4;
 #elif wemos_d1_mini32 
@@ -223,6 +223,16 @@ void analyseLigne(String ligne){
         Serial.print("ligne invalide : ");
         Serial.println(ligne);
     }
+}
+
+//----------------------------------------------
+//
+//      readConfig
+//
+//----------------------------------------------
+File sdCardOpenFile(char *filename){
+    String ligne;
+    return SD.open(filename);
 }
 
 //----------------------------------------------

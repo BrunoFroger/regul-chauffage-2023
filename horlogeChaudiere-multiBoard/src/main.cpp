@@ -13,6 +13,7 @@
 #include "pilotageChaudiere.hpp"
 #include "temperatures.hpp"
 #include "sdCard.hpp"
+#include "bddSqlite.hpp"
 
 
 #ifdef lolin_s2_mini
@@ -74,6 +75,7 @@ void setup() {
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
     if (!sdcardInit()) stop();
+    initBddSqlite();
     if (!initWifi()) stop();
     if (isWifiConnected()) initNtp();
     initCalendrier();

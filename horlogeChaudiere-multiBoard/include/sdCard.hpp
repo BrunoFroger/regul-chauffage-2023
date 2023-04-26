@@ -5,6 +5,7 @@
 //----------------------------------------------
 
 #include <Arduino.h>
+#include <SD.h>
 
 #ifndef __SDCARD__
 #define __SDCARD__
@@ -16,5 +17,6 @@
     extern void sauvegardeFichier(String filename, String datas);
     extern String lireFichier(String filename);
     extern void handleListFichierConfiguration(void);
+    extern File sdCardOpenFile(char *filename);
     
 #endif

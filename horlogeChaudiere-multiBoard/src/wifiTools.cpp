@@ -112,8 +112,7 @@ void deconnecteWifi(){
 //      handleWebRequete
 //
 //----------------------------------------------
-void handleWebRequete(void)
-{
+void handleWebRequete(void){
     // test si requete http reçue 
     //Serial.print("debut handleWebRequete\n");
     server.handleClient();
@@ -125,8 +124,7 @@ void handleWebRequete(void)
 //      handleSwitchAfficheurOnOff
 //
 //----------------------------------------------
-void handleSwitchAfficheurOnOff(void)
-{
+void handleSwitchAfficheurOnOff(void){
     switchAfficheurOnOff();
     server.sendHeader("Location", String("/commande"), true);
     server.send ( 302, "text/plain", "");
@@ -199,7 +197,8 @@ void handleRoot() {
 //      connectWifi
 //
 //----------------------------------------------
-bool connectWifi(void){    WiFi.mode(WIFI_STA);
+bool connectWifi(void){    
+    //WiFi.mode(WIFI_STA);
     Serial.println("connectWifi => debut");
     WiFi.disconnect();
     delay(100);
