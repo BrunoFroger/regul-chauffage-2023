@@ -198,7 +198,7 @@ void handleRoot() {
 //
 //----------------------------------------------
 bool connectWifi(void){    
-    //WiFi.mode(WIFI_STA);
+    WiFi.mode(WIFI_STA);
     Serial.println("connectWifi => debut");
     WiFi.disconnect();
     delay(100);
