@@ -33,6 +33,7 @@ bool insideEnvironnement;
 int pin_relai;
 bool SdChauffageOnOff;
 int SdConsigne;
+boolean SDCardInitOK=false;
 
 #define NB_ENVIRONNEMENTS   10
 
@@ -423,6 +424,7 @@ bool sdcardInit(void){
     if (!SD.begin()) {
 # endif
         Serial.println("initialization failed!");
+        SDCardInitOK=false;
         return false;
     }
     Serial.println("initialization done.");
@@ -446,6 +448,7 @@ bool sdcardInit(void){
         Serial.println("OFF");
     }
     listeEnvironnements();
+    SDCardInitOK=true;
     return true;
 }
 

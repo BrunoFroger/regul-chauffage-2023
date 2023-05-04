@@ -220,8 +220,12 @@ bool connectWifi(void){
     Serial.print("Connecting to ");
     Serial.println(wifiSsid);
     WiFi.mode(WIFI_STA);
+    Serial.println("wifi.mode ok");
     delay(100);
     WiFi.begin(wifiSsid, wifiPwd);
+    Serial.println("wifi.begin ok");
+    long rssi = WiFi.RSSI();
+    char tmp[50]; sprintf(tmp, "wifi RSSI : %ld", rssi); Serial.println(tmp);
     int cpt=0;
     int cpt2=0;
     int connected = WiFi.status() != WL_CONNECTED;
@@ -240,6 +244,7 @@ bool connectWifi(void){
         }
         connected = WiFi.status() != WL_CONNECTED;
     }
+    Serial.println("wifi connecte ok");
 
     if (cpt2 > 20){
         // on a  fait 20 tentatives
