@@ -66,7 +66,7 @@ void setAfficheurOnOff(bool state){
 //----------------------------------------------
 void ecritLigne(int numLigne, char *texte){
     char tmp[200];
-    sprintf(tmp,"ligne %d => %s", numLigne, texte); Serial.println(tmp);
+    //sprintf(tmp,"ligne %d => %s", numLigne, texte); Serial.println(tmp);
     int x=(numLigne + 1) * hauteurligne;
     ligneCourante=numLigne;
     strcpy(bufferLignes[ligneCourante], texte);
@@ -81,7 +81,7 @@ void ecritLigne(int numLigne, char *texte){
 //
 //----------------------------------------------
 void ecritLigneSuivante(char *texte){
-    Serial.println("-------- debut ecritLigneSuivante -----------");
+    //Serial.println("-------- debut ecritLigneSuivante -----------");
     if (ligneCourante >= nbLignesDisponibles - 1){
         // scroll vertical
         u8g2.clearDisplay();

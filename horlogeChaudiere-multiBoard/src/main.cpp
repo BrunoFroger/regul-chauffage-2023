@@ -63,7 +63,7 @@ void setup() {
             break;
         delay(10);
     }
-    char titre[50];
+    char titre[50], tmp[20];
     sprintf(titre, "+  %25s    +", TITRE);
     delay(1000);
     Serial.println("Serial initialized");
@@ -106,6 +106,8 @@ void setup() {
     }
     ecritLigneSuivante(getWifiSsid());
     ecritLigneSuivante(getIpAddress());
+    sprintf(tmp, "rssi : %ddb", getRSSI()); 
+    ecritLigneSuivante(tmp);
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");
