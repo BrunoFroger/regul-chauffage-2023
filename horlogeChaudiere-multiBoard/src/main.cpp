@@ -13,6 +13,8 @@
 #include "pilotageChaudiere.hpp"
 #include "temperatures.hpp"
 #include "sdCard.hpp"
+#include "scanI2C.hpp"
+
 
 
 #ifdef lolin_s2_mini
@@ -73,12 +75,28 @@ void setup() {
     Serial.println("+-------------------------------+");
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
-    if (!sdcardInit()) stop();
-    if (!initWifi()) stop();
-    if (isWifiConnected()) initNtp();
-    initCalendrier();
     initAfficheur();
+    ecritLigne(0, (char *)"afficheur OK");
+    if (1) {
+        scanI2C();
+        ecritLigneSuivante((char *)"scanI2C OK");
+    }
+    if (!sdcardInit()){
+        ecritLigneSuivante((char *)"sdcard NOK");
+        stop();
+    }
+    ecritLigneSuivante((char *)"sdcard OK");
+    if (!initWifi()){
+        stop();
+    }
+    if (isWifiConnected()){
+        ecritLigneSuivante((char *)"NTP OK");
+        initNtp();
+    }
+    initCalendrier();
+    ecritLigneSuivante((char *)"calend OK");
     initTemperatures();
+    ecritLigneSuivante((char *)"temp OK");
     initChaudiere();
     Serial.print("handleWebRequete : ");
     if (isWifiConnected() || isApMode()){

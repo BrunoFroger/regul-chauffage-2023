@@ -16,7 +16,7 @@
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
 // LOLIN Micro SD Shield V1.2.0: D4 (Default)
-// Feather ESP32 HUZZAH : ?? (Default)
+// Feather ESP32 HUZZAH : ?? 
 #ifdef lolin_s2_mini
     const int chipSelect = D4;
 #elif wemos_d1_mini32 
@@ -33,6 +33,7 @@ bool insideEnvironnement;
 int pin_relai;
 bool SdChauffageOnOff;
 int SdConsigne;
+boolean SDCardInitOK=false;
 
 #define NB_ENVIRONNEMENTS   10
 
@@ -241,6 +242,16 @@ void analyseLigne(String ligne){
 //      readConfig
 //
 //----------------------------------------------
+File sdCardOpenFile(char *filename){
+    String ligne;
+    return SD.open(filename);
+}
+
+//----------------------------------------------
+//
+//      readConfig
+//
+//----------------------------------------------
 void readConfig(void){
     String ligne;
     String filename = "/chaudiere/config.txt";
@@ -424,6 +435,7 @@ bool sdcardInit(void){
     if (!SD.begin()) {
 # endif
         Serial.println("initialization failed!");
+        SDCardInitOK=false;
         return false;
     }
     Serial.println("initialization done.");
@@ -447,6 +459,7 @@ bool sdcardInit(void){
         Serial.println("OFF");
     }
     listeEnvironnements();
+    SDCardInitOK=true;
     return true;
 }
 

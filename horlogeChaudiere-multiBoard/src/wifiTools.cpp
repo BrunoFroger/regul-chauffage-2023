@@ -135,8 +135,7 @@ void deconnecteWifi(){
 //      handleWebRequete
 //
 //----------------------------------------------
-void handleWebRequete(void)
-{
+void handleWebRequete(void){
     // test si requete http reçue 
     //Serial.print("debut handleWebRequete\n");
     server.handleClient();
@@ -148,8 +147,7 @@ void handleWebRequete(void)
 //      handleSwitchAfficheurOnOff
 //
 //----------------------------------------------
-void handleSwitchAfficheurOnOff(void)
-{
+void handleSwitchAfficheurOnOff(void){
     switchAfficheurOnOff();
     server.sendHeader("Location", String("/commande"), true);
     server.send ( 302, "text/plain", "");
@@ -321,13 +319,13 @@ bool connectWifi(void){
         Serial.print("ip locale = ");
         IPAddress tmpIp = WiFi.localIP();
         sprintf(ipLocale,"%d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipLocale);
-
         //IPAddress gatewayIp = WiFi.gatewayIP();
         tmpIp = WiFi.gatewayIP();
         sprintf(ipGateway,"gateway = %d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipGateway);
         Serial.println((String)"RSSI = " + WiFi.RSSI() + " db");
         wifiConnected = true;
     }
+    Serial.println("wifi connecte ok");
 
     server.begin();
     server.onNotFound(handlePageNotFound);

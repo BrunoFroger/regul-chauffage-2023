@@ -21,4 +21,29 @@ liste des todo du projet
     - parametres de regulation s'il y en afficheur
     - adresses des autres arduino (capteurs de temperature distants)
     - plages modèles
-    
+- description base de données chaudière
+    - constantes :
+        - nbPlagesParJour : int
+        - nbPlagesModele : int
+        - nbPlagesUser : int
+    - table calendrier :
+        - id : index
+        - nom : chaine(20)
+        - liste des plages semaine : liste d'index de plages semaine
+    - table semaine :
+        - id : index
+        - type : type de plage (modeles de base, modeles utilisateur, plages regulation semaine)
+        - nom : text
+        - index de plage : int
+        - actif : booleen (on/off)
+    - table plage :
+        - id : index
+        - type : type de plage (modeles de base, modeles utilisateur, plages regulation semaine)
+        - nom : text
+        - jour de la semaine : int (0-6)
+        - numeroPlage : int (0-5) nombre de plages possible pour chauqe jour
+        - heure debut : int (0-24)
+        - minute debut : int (0-59)
+        - heure fin : int (0-24)
+        - minute fin : int (0-59)
+        - consigne : int (1/10 degres)
