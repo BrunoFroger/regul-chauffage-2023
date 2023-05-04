@@ -92,6 +92,15 @@ void setPlageJournee(plageHoraire *ptrPlage){
 
 //----------------------------------------------
 //
+//      setPlageAbsent
+//
+//----------------------------------------------
+void setPlageAbsent(plageHoraire *ptrPlage){
+    setPlage(ptrPlage, PLAGE_MODELE_ABSENT, (char *)"Abscent", 0, 0, 23, 59, true, consigneReferenceAbsent, true);
+}
+
+//----------------------------------------------
+//
 //      chargeCalendrier
 //
 //----------------------------------------------
@@ -223,6 +232,9 @@ void initCalendrier(void){
     setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
     // plage modele JOURNEE
     setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
+    //Serial.print(listeDonneesCalendrier());
+    // plage modele ABSCENT
+    setPlageAbsent(&calendrier.plagesModeles[PLAGE_MODELE_ABSENT]);
     //Serial.print(listeDonneesCalendrier());
 
     for (int i = 0 ; i < NB_PLAGES_USER ; i++){

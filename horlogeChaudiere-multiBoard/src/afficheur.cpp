@@ -10,12 +10,13 @@
 #include "wifiTools.hpp"
 #include "ntp.hpp"
 #include "calendrier.hpp"
+#include "temperatures.hpp"
 #include "pilotageChaudiere.hpp"
 
 char bufferLigne1[20];
 char bufferLigne2[20];
 int cptValeurs=0;
-int delayRefreshAfficheur = 100;
+int delayRefreshAfficheur = 1000;
 int lastRefreshAfficheur = 0;
 bool afficheurOnOff = true;
 //int delayVeilleAfficheur = 100;
@@ -65,8 +66,7 @@ void setAfficheurOnOff(bool state){
 //
 //----------------------------------------------
 void ecritLigne(int numLigne, char *texte){
-    char tmp[200];
-    //sprintf(tmp,"ligne %d => %s", numLigne, texte); Serial.println(tmp);
+    //char tmp[200]; sprintf(tmp,"ligne %d => %s", numLigne, texte); Serial.println(tmp);
     int x=(numLigne + 1) * hauteurligne;
     ligneCourante=numLigne;
     strcpy(bufferLignes[ligneCourante], texte);
@@ -155,28 +155,38 @@ void initAfficheur(void){
 //
 //----------------------------------------------
 void refreshAfficheur(void){
-    return;
     if (afficheurOnOff){  
         int tmp;
         tmp = millis() - lastRefreshAfficheur;
         //Serial.println(tmp);
         if (tmp > delayRefreshAfficheur){
+            //Serial.println("refresh afficheur");
             lastRefreshAfficheur = millis();
-            u8g2.clearDisplay();
-            for (int i = 0 ; i < nbLignesDisponibles ; i++){
-                u8g2.setCursor(i,0);
-
+            int idx=0;
+            //sprintf(bufferLignes[idx++], "  Chaudiere");
+            sprintf(bufferLignes[idx++], "   %s",getFormatedTime());
+            sprintf(bufferLignes[idx++], "%s", getIpAddress());
+            sprintf(bufferLignes[idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
+            if (getChauffageOnOff()){
+                sprintf(bufferLignes[idx++], "Chauff : ON");
+            } else {
+                sprintf(bufferLignes[idx++], "Chauff : OFF");
+            }
+            if (getChauffageStatus()){
+                sprintf(bufferLignes[idx++], "Prog   : ON");
+            } else {
+                sprintf(bufferLignes[idx++], "Prog   : OFF");
             }
             if (getCirculateurOnOff()){
-                sprintf(bufferLigne1, "%s ON (%d%%)", getFormatedTime(), getCommandeVanneChauffage());
+                sprintf(bufferLignes[idx++], "Pompe  : ON");
             } else {
-                sprintf(bufferLigne1, "%s OFF (%d%%)", getFormatedTime(), getCommandeVanneChauffage());
+                sprintf(bufferLignes[idx++], "Pompe  : OFF");
             }
-            u8g2.print(bufferLigne1);
-            u8g2.setCursor(0,1);
-            sprintf(bufferLigne2,"%s", getIpAddress());
-            u8g2.print(bufferLigne2);
-            u8g2.display();
+            sprintf(bufferLignes[idx++], "");
+            u8g2.clearDisplay();
+            for (int i = 0 ; i < nbLignesDisponibles ; i++){
+                ecritLigne(i, bufferLignes[i]);
+            }
         }
     } else {
         u8g2.clearDisplay();

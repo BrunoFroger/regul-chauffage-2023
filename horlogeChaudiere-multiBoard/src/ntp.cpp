@@ -27,7 +27,9 @@ WiFiUDP ntpUDP;
 /*
 * Choix du serveur NTP pour récupérer l'heure, 3600 =1h est le fuseau horaire et 60000=60s est le * taux de rafraichissement
 */
-NTPClient temps(ntpUDP, "fr.pool.ntp.org", 3600, 60000);
+const char *ntpServer = "fr.pool.ntp.org";
+//NTPClient temps(ntpUDP, ntpServer, 3600, 60000); // heure d'hivers
+NTPClient temps(ntpUDP, ntpServer, 7200, 60000); // heure d'été
 char formatedTimeFull[30];
 char formatedTime[30];
 int dayOfWeek, heure, minute;

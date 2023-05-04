@@ -90,8 +90,8 @@ void setup() {
         stop();
     }
     if (isWifiConnected()){
-        ecritLigneSuivante((char *)"NTP OK");
         initNtp();
+        ecritLigneSuivante((char *)"NTP OK");
     }
     initCalendrier();
     ecritLigneSuivante((char *)"calend OK");
@@ -111,6 +111,7 @@ void setup() {
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");
+    delay(5000);
 }
 
 

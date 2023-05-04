@@ -11,7 +11,7 @@
 
     #define NB_JOURS            7
     #define NB_PLAGES_PAR_JOUR  5
-    #define NB_PLAGES_MODELE    5
+    #define NB_PLAGES_MODELE    6
     #define NB_PLAGES_USER      5
 
     #define PLAGE_MODELE_NUIT       0
@@ -19,6 +19,7 @@
     #define PLAGE_MODELE_COUCHER    2
     #define PLAGE_MODELE_ALL        3
     #define PLAGE_MODELE_JOUNEE     4
+    #define PLAGE_MODELE_ABSENT     5
 
     struct plageHoraire{
         int8_t modele;

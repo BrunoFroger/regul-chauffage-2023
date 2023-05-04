@@ -689,7 +689,7 @@ void handleListFichierConfiguration(void){
 //----------------------------------------------
 int lastSsidChecked=0;
 bool getNewSsid(void){
-    for (int i = lastSsidChecked ;i < NB_ENVIRONNEMENTS ; i++){
+    for (int i = lastSsidChecked ; i < NB_ENVIRONNEMENTS ; i++){
         structEnvironnement *env = &listeEnvironnement[i];
         if (env->available == SSID_NOTCHECKED){
             setWifiParameters(env->wifiSsid, env->wifiPwd, env->wifiMode);
@@ -708,7 +708,7 @@ void setWifiMode(char *ssid,int available){
     for (int i = 0 ;i < NB_ENVIRONNEMENTS ; i++){
         structEnvironnement *env = &listeEnvironnement[i];
         if (strcmp(env->wifiSsid,ssid) == 0){
-            env->available, available;
+            env->available = available;
             return;
         }
     }

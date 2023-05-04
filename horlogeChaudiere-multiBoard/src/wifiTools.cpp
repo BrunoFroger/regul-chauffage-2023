@@ -309,11 +309,13 @@ bool connectWifi(void){
             // imposible de se connecter au wifi !
             Serial.println("\nWifi non connecte");
             wifiConnected = false;
+            setWifiMode(wifiSsid, SSID_UNAVAILABLE);
             return false;
         } else {
             // on a reussit a se connecter au wifi
             Serial.println("");
             Serial.println("WiFi connecte");
+            setWifiMode(wifiSsid, SSID_AVAILABLE);
         }
         // Print the IP address
         Serial.print("ip locale = ");
