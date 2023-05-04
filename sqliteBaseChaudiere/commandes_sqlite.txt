@@ -1,0 +1,18 @@
+commandes sqlite
+
+.help
+.open chaudiere.db
+.databases	liste des bases de donnees
+.tables		liste des tables
+.schema		liste des champs d'une table
+.read fichier.sql
+
+select * from plages;
+select * from modeles;
+select * from calendrier;
+select * from users;
+
+delete from plages where TYPE = "MODELE";
+delete from plages where TYPE = "USER";
+delete from plages where TYPE = "SEMAINE";
+
