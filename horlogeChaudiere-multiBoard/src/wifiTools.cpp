@@ -223,7 +223,7 @@ void handleRoot() {
 //      onWiFiEvent
 //
 //----------------------------------------------
-void onWiFiEvent(WiFiEvent_t event){
+/*void onWiFiEvent(WiFiEvent_t event){
     switch (event)
     {
     case SYSTEM_EVENT_AP_STACONNECTED:
@@ -236,7 +236,7 @@ void onWiFiEvent(WiFiEvent_t event){
     default:
         break;
     }
-}
+}*/
 
 //----------------------------------------------
 //
@@ -245,7 +245,7 @@ void onWiFiEvent(WiFiEvent_t event){
 //----------------------------------------------
 bool connectWifi(void){
     Serial.println("connectWifi => debut");
-    WiFi.onEvent(onWiFiEvent);
+    //WiFi.onEvent(onWiFiEvent);
     if (strcmp(wifiMode, "AP") == 0){
         Serial.println("Initialisation du mode Acces Point");
         WiFi.mode(WIFI_AP);
@@ -356,7 +356,6 @@ bool connectWifi(void){
 
     Serial.println("connectWifi => fin");
     return true;
-
 }
 
 //----------------------------------------------
@@ -376,7 +375,12 @@ bool initWifi(void){
         strcpy(wifiPwd, localWifiPwd);
         strcpy(wifiMode, "STATION");
     }
-    if (!connectWifi()) return false;
+    while (connectWifi() == false){
+        if (!getNewSsid()){
+            return false;
+        } 
+        setWifiMode(wifiSsid,SSID_AVAILABLE);
+    }
 
     // 
     //  Definition du pied de page

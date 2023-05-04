@@ -76,7 +76,7 @@ void setup() {
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
     initAfficheur();
-    ecritLigne(0, (char *)"afficheur OK");
+    ecritLigneSuivante((char *)"afficheur OK");
     if (1) {
         scanI2C();
         ecritLigneSuivante((char *)"scanI2C OK");
@@ -104,6 +104,8 @@ void setup() {
     } else {
         Serial.println("NOK");
     }
+    ecritLigneSuivante(getWifiSsid());
+    ecritLigneSuivante(getIpAddress());
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");

@@ -12,6 +12,7 @@
 #include "temperatures.hpp"
 #include "wifiTools.hpp"
 #include "pilotageChaudiere.hpp"
+#include "sdCard.hpp"
 
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
@@ -44,6 +45,7 @@ struct structEnvironnement{
     char wifiSsid[20];
     char wifiPwd[25];
     char ipTempInt[20];
+    int available = SSID_NOTCHECKED;
 };
 
 structEnvironnement listeEnvironnement[NB_ENVIRONNEMENTS];
@@ -112,6 +114,7 @@ void initEnvironnement(String ligne){
             strcpy(env->wifiSsid, "");
             strcpy(env->wifiPwd, "");
             strcpy(env->ipTempInt, "");
+            env->available = SSID_NOTCHECKED;
             indexEnvironnementCourant = i;
             break;
         }
@@ -677,4 +680,36 @@ void handleListFichierConfiguration(void){
     page += "</html>\n";  // Fin de la page HTML
     server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
     server.send(200, "text/html", page);
+}
+
+//----------------------------------------------
+//
+//      getNewSsid
+//
+//----------------------------------------------
+int lastSsidChecked=0;
+bool getNewSsid(void){
+    for (int i = lastSsidChecked ;i < NB_ENVIRONNEMENTS ; i++){
+        structEnvironnement *env = &listeEnvironnement[i];
+        if (env->available == SSID_NOTCHECKED){
+            setWifiParameters(env->wifiSsid, env->wifiPwd, env->wifiMode);
+            return true;
+        }
+    }
+    return false;
+}
+
+//----------------------------------------------
+//
+//      setWifiMode
+//
+//----------------------------------------------
+void setWifiMode(char *ssid,int available){
+    for (int i = 0 ;i < NB_ENVIRONNEMENTS ; i++){
+        structEnvironnement *env = &listeEnvironnement[i];
+        if (strcmp(env->wifiSsid,ssid) == 0){
+            env->available, available;
+            return;
+        }
+    }
 }
