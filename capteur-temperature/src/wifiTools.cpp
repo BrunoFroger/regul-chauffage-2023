@@ -301,6 +301,7 @@ bool connectWifi(void){
     server.onNotFound(handlePageNotFound);
     server.on("/", handleRoot);
     server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
+    server.on("/getTemperatureInterieure", handleGetTemeratureInterieure);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");

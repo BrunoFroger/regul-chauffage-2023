@@ -53,16 +53,6 @@ void setConsigne(int valeur){
 
 //----------------------------------------------
 //
-//      initTemperature
-//
-//----------------------------------------------
-void initTemperatures(void){
-    pinMode(PIN_TEMPERATURE_INT,INPUT_PULLUP);
-    pinMode(PIN_TEMPERATURE_EXT,INPUT_PULLUP);
-}
-
-//----------------------------------------------
-//
 //      handleGetTemeratureInterieure
 //
 //----------------------------------------------
@@ -77,6 +67,16 @@ void handleGetTemeratureInterieure(void)
     //page += "\n";
     server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
     server.send(200, "text/plain", page);
+}
+
+//----------------------------------------------
+//
+//      initTemperature
+//
+//----------------------------------------------
+void initTemperatures(void){
+    pinMode(PIN_TEMPERATURE_INT,INPUT_PULLUP);
+    pinMode(PIN_TEMPERATURE_EXT,INPUT_PULLUP);
 }
 
 //----------------------------------------------
