@@ -54,7 +54,7 @@ WiFiClient client;
         consigneTemperature = consigneReferenceJour;
     }
     if (strcmp(localIPCapteurTemperatureInterieure, "") == 0){
-        strcpy(localIPCapteurTemperatureInterieure, IPcapteurTemperature);
+        strcpy(localIPCapteurTemperatureInterieure, localIPCapteurTemperatureInterieure);
     }
 }
 
