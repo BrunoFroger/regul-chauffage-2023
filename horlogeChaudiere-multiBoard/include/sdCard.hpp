@@ -24,5 +24,6 @@
     extern File sdCardOpenFile(char *filename);
     extern bool getNewSsid(void);
     extern void setWifiMode(char *ssid, int available);
+    extern void handleUpdateIpTempInt(void);
     
 #endif
