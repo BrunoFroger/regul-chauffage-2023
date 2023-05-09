@@ -6,37 +6,93 @@
 
 #include <Arduino.h>
 
-
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-
+#include "ntp.hpp"
+#include "afficheur.hpp"
 #include "temperature.hpp"
 
-ESP8266WebServer server(80);
+#ifdef lolin_s2_mini
+    #include <ESP8266WiFi.h>
+    #include <ESP8266WebServer.h>
+    #define BOARD "lolin s2 mini ESP8266"
+    #pragma message("lolin_s2_mini")
+    ESP8266WebServer server(80);
+#elif wemos_d1_mini32 
+    #include <SPI.h>
+    #include <WiFi.h>
+    #include <WebServer.h>
+    #define BOARD "Wemos D1 mini esp32"
+    #pragma message("wemos_d1_mini32")
+    WebServer server(80);
+#elif adafruit_feather_m0 
+    #include <WiFi.h>
+    #include <WebServer.h>
+    #define BOARD "feather esp32"
+    #pragma message("adafruit_feather_m0")
+    WebServer server(80);
+#else 
+    #pragma message("Unsupported board selection")
+    #error Unsupported board selection.
+#endif
+
+char wifiSsid[50];
+char wifiPwd[50];
+char wifiMode[10];
 
 int cptTryWifi = 0;
 char ipLocale[50] = "";
 char ipGateway[50];
-
+char netMask[50];
+String piedDePage = "";
+String enteteDePage = "";
+bool wifiConnected = false;
 
 //----------------------------------------------
 //
-//      refreshWifi
+//      isWifiConnected
 //
 //----------------------------------------------
-void refreshWifi(void)
-{
-    // test si requete http reçue
-    server.handleClient();
+bool isWifiConnected(void){
+    return wifiConnected;
 }
 
 //----------------------------------------------
 //
-//      getIpAdresse
+//      getWifiSsid
 //
 //----------------------------------------------
-char *getIpAdresse(void){
+char *getWifiSsid(void){
+    return wifiSsid;
+}
+
+//----------------------------------------------
+//
+//      getIpAddress
+//
+//----------------------------------------------
+char *getIpAddress(){
+    if (strlen(ipLocale) == 0) return (char *)"non connecte";
     return ipLocale;
+}
+
+//----------------------------------------------
+//
+//      isApMode
+//
+//----------------------------------------------
+bool isApMode(){
+    if (strcmp(wifiMode, "AP") == 0)
+        return true;
+    else
+        return false;
+}
+
+//----------------------------------------------
+//
+//      getRSSI
+//
+//----------------------------------------------
+int getRSSI(){
+    return WiFi.RSSI();
 }
 
 //----------------------------------------------
@@ -44,8 +100,8 @@ char *getIpAdresse(void){
 //      wifiNotFound
 //
 //----------------------------------------------
-void wifiNotFound(void){
-    Serial.println("Page wifiNotFound");
+void handlePageNotFound(void){
+    Serial.println("handlePageNotFound");
     String page = "Page inexistante";
     page += "\n";
     page += "\n";
@@ -67,6 +123,30 @@ void deconnecteWifi(){
         //Serial.println("deconnecteWifi => OK");
     }
     //Serial.println("deconnecteWifi => fin");
+    wifiConnected = false;
+}
+
+//----------------------------------------------
+//
+//      handleWebRequete
+//
+//----------------------------------------------
+void handleWebRequete(void){
+    // test si requete http reçue 
+    //Serial.print("debut handleWebRequete\n");
+    server.handleClient();
+    //Serial.print("fin handleWebRequete\n");
+}
+
+//----------------------------------------------
+//
+//      handleSwitchAfficheurOnOff
+//
+//----------------------------------------------
+void handleSwitchAfficheurOnOff(void){
+    switchAfficheurOnOff();
+    server.sendHeader("Location", String("/"), true);
+    server.send ( 302, "text/plain", "");
 }
 
 //----------------------------------------------
@@ -93,13 +173,33 @@ void handleRoot() {
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
-    page += "    <title> Capteur de temperature </title>\n";
+    page += enteteDePage;
+    page += "    <title> Capteur temperature </title>\n";
     page += "    <meta charset='UTF-8'/>\n";
-    page += "    <meta http-equiv='refresh' content='60'> ";
     page += "</head>\n";
 
     page += "<body>\n";
-    page += "    <h1> Capteur de temperature </h1>\n";
+    page += "    <h1> Capteur temperature </h1>\n";
+
+    page += "    <div>\n";
+    page += "        <p>Nous sommes \n";
+    page +=          getDayString(getDayOfWeek());
+    page +=          ", il est ";
+    page +=          getFormatedTime();
+    page += "    <div>\n";
+
+    page += "    <div class='w3-center w3-padding-16'>\n";
+    page += "        <p>Temperature interieure : ";
+    page +=          getTemperatureInterieure();
+    page += "        db</p>\n";
+    page += "        <p>Temperature exterieure : ";
+    page +=          getTemperatureExterieure();
+    page += "        db</p>\n";
+    page += "        <p>Qualité du signal Wifi (RSSI) : ";
+    page +=          getRSSI();
+    page += "        db</p>\n";
+    page += "    </div>\n";
+    page +=      piedDePage;
 
     page += "</body>\n";
     page += "</html>\n";  // Fin de la page HTML
@@ -110,77 +210,173 @@ void handleRoot() {
 
 //----------------------------------------------
 //
+//      connectWifi
+//
+//----------------------------------------------
+bool connectWifi(void){
+    Serial.println("connectWifi => debut");
+    //WiFi.onEvent(onWiFiEvent);
+    if (strcmp(wifiMode, "AP") == 0){
+        Serial.println("Initialisation du mode Acces Point");
+        WiFi.mode(WIFI_AP);
+    } else {
+        Serial.println("Initialisation du mode Station");
+        WiFi.mode(WIFI_STA);
+    }
+
+    if (strcmp(wifiMode, "AP") == 0){
+        delay(500);
+        IPAddress apLocalIp(192,168,10,1);
+        IPAddress apGateway(192,168,10,0);
+        IPAddress apSubnetMask(255,255,255,0);
+        WiFi.softAPConfig(apLocalIp, apGateway, apSubnetMask);
+        WiFi.softAP(wifiSsid, wifiPwd);
+        delay(1000);
+        sprintf(ipGateway,"gateway = %d.%d.%d.%d",apGateway[0],apGateway[1],apGateway[2],apGateway[3]); Serial.println(ipGateway);
+        sprintf(ipLocale,"LocalIp = %d.%d.%d.%d",apLocalIp[0],apLocalIp[1],apLocalIp[2],apLocalIp[3]); Serial.println(ipLocale);
+        sprintf(netMask,"netmask = %d.%d.%d.%d",apSubnetMask[0],apSubnetMask[1],apSubnetMask[2],apSubnetMask[3]); Serial.println(netMask);
+    } else {
+        WiFi.disconnect();
+        delay(100);
+        //Serial.println("initWifi => check wifi status");
+        if (WiFi.status() == WL_NO_SHIELD){
+            Serial.println("initWifi => ERROR : No shield detected !!");
+            Serial.print("error code = ");
+            Serial.println(WiFi.status());
+            wifiConnected = false;
+            return false;
+        }
+        Serial.println("initWifi => a shield is detected");
+        delay(1000);
+        deconnecteWifi();
+        delay(1000);
+        cptTryWifi = 0;
+        // Connect to WiFi network
+        Serial.print("Connecting to ");
+        Serial.println(wifiSsid);
+        delay(100);
+        WiFi.begin(wifiSsid, wifiPwd);
+        int cpt=0;
+        int cpt2=0;
+        int connected = WiFi.status() != WL_CONNECTED;
+        while (connected) {  //Attente de la connexion
+            delay(500);
+            //sprintf(buffer,"ssid = %s, pwd = %s", mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd); Serial.println(buffer);
+            //Serial.print("wifiStatus = "); Serial.println(connected);
+            //WiFi.begin(mesDonneesCapteurs.liveboxSsid, mesDonneesCapteurs.liveboxPwd);
+            Serial.print(".");   //Typiquement 5 à 10 points avant la connexion
+            if (cpt++ >= 10){
+                Serial.println();
+                cpt=0;
+            }
+            if (cpt2++ > 20){
+                break;
+            }
+            connected = WiFi.status() != WL_CONNECTED;
+        }
+        if (cpt2 > 20){
+            // on a  fait 20 tentatives
+            // imposible de se connecter au wifi !
+            Serial.println("\nWifi non connecte");
+            wifiConnected = false;
+            return false;
+        } else {
+            // on a reussit a se connecter au wifi
+            Serial.println("");
+            Serial.println("WiFi connecte");
+        }
+        // Print the IP address
+        Serial.print("ip locale = ");
+        IPAddress tmpIp = WiFi.localIP();
+        sprintf(ipLocale,"%d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipLocale);
+        //IPAddress gatewayIp = WiFi.gatewayIP();
+        tmpIp = WiFi.gatewayIP();
+        sprintf(ipGateway,"gateway = %d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipGateway);
+        Serial.println((String)"RSSI = " + WiFi.RSSI() + " db");
+        wifiConnected = true;
+    }
+    Serial.println("wifi connecte ok");
+
+    server.begin();
+    server.onNotFound(handlePageNotFound);
+    server.on("/", handleRoot);
+    server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
+    Serial.println("======================");
+
+    Serial.println("connectWifi => fin");
+    return true;
+}
+
+//----------------------------------------------
+//
 //      initWifi
 //
 //----------------------------------------------
-void initWifi(char *ssid, char *pwd){
+bool initWifi(void){
 
     Serial.println("======================");
     Serial.println("|     Init Wifi      |");
     Serial.println("----------------------");
     Serial.println("initWifi => debut");
-    delay(100);
-    //Serial.println("initWifi => check wifi status");
-    if (WiFi.status() == WL_NO_SHIELD){
-        Serial.println("initWifi => ERROR : No shield detected !!");
-        return;
+    //Serial.println("Connexion en mode : " + String(wifiMode));
+    if (strcmp(wifiSsid, "") == 0){
+        strcpy(wifiSsid, localWifiSsid);
+        strcpy(wifiPwd, localWifiPwd);
+        strcpy(wifiMode, "STATION");
     }
-    Serial.println("initWifi => a shield is detected");
-    delay(1000);
-    deconnecteWifi();
-    delay(1000);
-    cptTryWifi = 0;
-    
-    // Connect to WiFi network
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-    WiFi.mode(WIFI_STA);
-    delay(100);
-    WiFi.begin(ssid, pwd);
-    int cpt=0;
-    int cpt2=0;
-    int connected = WiFi.status() != WL_CONNECTED;
-    while (connected) {  //Attente de la connexion
-        delay(500);
-        Serial.print(".");   //Typiquement 5 à 10 points avant la connexion
-        if (cpt++ >= 10){
-            Serial.println();
-            cpt=0;
-        }
-        if (cpt2++ > 20){
-            break;
-        }
-        connected = WiFi.status() != WL_CONNECTED;
+    if (connectWifi() == false){
+        return false;
     }
 
-    if (cpt2 > 20){
-        // on a  fait 20 tentatives
-        // imposible de se connecter au wifi !
-        Serial.println("\nWifi non connecte");
-        return;
-    } else {
-        // on a reussit a se connecter au wifi
-        Serial.println("");
-        Serial.println("WiFi connecte");
-    }
+    // 
+    //  Definition du pied de page
+    //
+    piedDePage += "    <div class='w3-center w3-padding-16'>\n";
+    piedDePage += "        <p>Ce serveur est hébergé sur un arduino (";
+    piedDePage +=          BOARD;
+    piedDePage +=          ")</p>\n";
+    piedDePage += "        <i>Créé par ";
+    piedDePage +=          copyright;
+    piedDePage +=          "</i>\n";
+    piedDePage += "    </div>\n";
 
-    // Print the IP address
-    Serial.print("ip locale = ");
-    IPAddress tmpIp = WiFi.localIP();
-    sprintf(ipLocale,"%d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipLocale);
+    // 
+    //  Definition de l'entete de page
+    //
+    enteteDePage += "    <div>";
+    /*enteteDePage += "        <table>";
+    enteteDePage += "            <tr>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='/'>home</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='commande'>commande</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='calendrier'>calendrier</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='temperatures'>temperatures</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "                <td>";
+    enteteDePage += "                    <a href='config'>config</a>";
+    enteteDePage += "                </td>";
+    enteteDePage += "            </tr>";
+    enteteDePage += "        </table>";*/
+    enteteDePage += "    </div>";
+    return true;
+}
 
-    //IPAddress gatewayIp = WiFi.gatewayIP();
-    tmpIp = WiFi.gatewayIP();
-    sprintf(ipGateway,"gateway = %d.%d.%d.%d",tmpIp[0],tmpIp[1],tmpIp[2],tmpIp[3]); Serial.println(ipGateway);
-
-
-    server.begin();
-    delay (10);
-    server.onNotFound(wifiNotFound);
-    server.on("/getTemperatureInterieure", handleGetTemeratureInterieure);
-    server.on("/", handleRoot);
-    Serial.println("======================");
-
-
-    Serial.println("initWifi => fin");
+//----------------------------------------------
+//
+//      setWifiParameters
+//
+//----------------------------------------------
+void setWifiParameters(char *ssid, char *pwd, char *mode){
+    char ligne[100];
+    strcpy(wifiSsid, ssid);
+    strcpy(wifiPwd, pwd);
+    strcpy(wifiMode, mode);
+    sprintf(ligne, "setWifiParameters : ssid = <%s> / pwd = <%s> / mode = <%s>\n", ssid, pwd, mode); Serial.print(ligne);
+    //connectWifi();
 }

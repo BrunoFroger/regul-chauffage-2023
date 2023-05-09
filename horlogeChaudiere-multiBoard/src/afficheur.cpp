@@ -7,16 +7,17 @@
 
 #include <Arduino.h>
 #include <U8g2lib.h>
+
 #include "wifiTools.hpp"
 #include "ntp.hpp"
 #include "calendrier.hpp"
 #include "temperatures.hpp"
 #include "pilotageChaudiere.hpp"
 
-char bufferLigne1[20];
-char bufferLigne2[20];
+#define NB_ECRANS    2
+
 int cptValeurs=0;
-int delayRefreshAfficheur = 1000;
+int delayRefreshAfficheur = 3000;
 int lastRefreshAfficheur = 0;
 bool afficheurOnOff = true;
 //int delayVeilleAfficheur = 100;
@@ -26,7 +27,8 @@ U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 int hauteurligne;
 int ligneCourante = 0;
 int nbLignesDisponibles;
-char bufferLignes[10][20];
+int ecranCourant=0;
+char bufferLignesEcran[NB_ECRANS][10][20];
 
 //----------------------------------------------
 //
@@ -65,11 +67,11 @@ void setAfficheurOnOff(bool state){
 //      ecritLigne
 //
 //----------------------------------------------
-void ecritLigne(int numLigne, char *texte){
+void ecritLigne(int ecran, int numLigne, char *texte){
     //char tmp[200]; sprintf(tmp,"ligne %d => %s", numLigne, texte); Serial.println(tmp);
     int x=(numLigne + 1) * hauteurligne;
     ligneCourante=numLigne;
-    strcpy(bufferLignes[ligneCourante], texte);
+    strcpy(bufferLignesEcran[ecran][ligneCourante], texte);
     u8g2.drawStr(0,x,texte);
     u8g2.sendBuffer();
     //delay(1000);
@@ -80,17 +82,17 @@ void ecritLigne(int numLigne, char *texte){
 //      ecritLigneSuivante
 //
 //----------------------------------------------
-void ecritLigneSuivante(char *texte){
+void ecritLigneSuivante(int ecran, char *texte){
     //Serial.println("-------- debut ecritLigneSuivante -----------");
     if (ligneCourante >= nbLignesDisponibles - 1){
         // scroll vertical
         u8g2.clearDisplay();
         for (int i = 0 ; i < nbLignesDisponibles - 1 ; i++){
-            ecritLigne(i, bufferLignes[i+1]);
+            ecritLigne(ecran, i, bufferLignesEcran[ecran][i+1]);
         }
-        ecritLigne(nbLignesDisponibles - 1, texte);
+        ecritLigne(ecran, nbLignesDisponibles - 1, texte);
     } else {
-        ecritLigne(++ligneCourante, texte);
+        ecritLigne(ecran, ++ligneCourante, texte);
     }
 }
 
@@ -164,29 +166,40 @@ void refreshAfficheur(void){
             lastRefreshAfficheur = millis();
             int idx=0;
             //sprintf(bufferLignes[idx++], "  Chaudiere");
-            sprintf(bufferLignes[idx++], "   %s",getFormatedTime());
-            sprintf(bufferLignes[idx++], "%s", getIpAddress());
-            sprintf(bufferLignes[idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
-            if (getChauffageOnOff()){
-                sprintf(bufferLignes[idx++], "Chauff : ON");
-            } else {
-                sprintf(bufferLignes[idx++], "Chauff : OFF");
+            sprintf(bufferLignesEcran[ecranCourant][idx++], "%s  (%d/%d)",getFormatedTime(), ecranCourant + 1, NB_ECRANS);
+            sprintf(bufferLignesEcran[ecranCourant][idx++], "%s", getIpAddress());
+            switch(ecranCourant){
+                case 0 :
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
+                    if (getChauffageOnOff()){
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Chauff : ON");
+                    } else {
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Chauff : OFF");
+                    }
+                    if (getChauffageStatus()){
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Prog   : ON");
+                    } else {
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Prog   : OFF");
+                    }
+                    if (getCirculateurOnOff()){
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Pompe  : ON");
+                    } else {
+                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Pompe  : OFF");
+                    }
+                    break;
+                case 1 :
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Int  : %.1f", (double)(getTemperatureInterieure()/10));
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Ext  : %.1f", (double)(getTemperatureExterieure()/10));
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Pompe  : %d", getCommandeVanneChauffage());
+                    break;
             }
-            if (getChauffageStatus()){
-                sprintf(bufferLignes[idx++], "Prog   : ON");
-            } else {
-                sprintf(bufferLignes[idx++], "Prog   : OFF");
-            }
-            if (getCirculateurOnOff()){
-                sprintf(bufferLignes[idx++], "Pompe  : ON");
-            } else {
-                sprintf(bufferLignes[idx++], "Pompe  : OFF");
-            }
-            sprintf(bufferLignes[idx++], "");
             u8g2.clearDisplay();
             for (int i = 0 ; i < nbLignesDisponibles ; i++){
-                ecritLigne(i, bufferLignes[i]);
+                ecritLigne(ecranCourant, i, bufferLignesEcran[ecranCourant][i]);
             }
+            ecranCourant++;
+            if (ecranCourant >= NB_ECRANS) ecranCourant = 0;
         }
     } else {
         u8g2.clearDisplay();

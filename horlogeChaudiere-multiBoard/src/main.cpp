@@ -76,27 +76,27 @@ void setup() {
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
     initAfficheur();
-    ecritLigneSuivante((char *)"afficheur OK");
+    ecritLigneSuivante(0, (char *)"afficheur OK");
     if (1) {
         scanI2C();
-        ecritLigneSuivante((char *)"scanI2C OK");
+        ecritLigneSuivante(0, (char *)"scanI2C OK");
     }
     if (!sdcardInit()){
-        ecritLigneSuivante((char *)"sdcard NOK");
+        ecritLigneSuivante(0, (char *)"sdcard NOK");
         stop();
     }
-    ecritLigneSuivante((char *)"sdcard OK");
+    ecritLigneSuivante(0, (char *)"sdcard OK");
     if (!initWifi()){
         stop();
     }
     if (isWifiConnected()){
         initNtp();
-        ecritLigneSuivante((char *)"NTP OK");
+        ecritLigneSuivante(0, (char *)"NTP OK");
     }
     initCalendrier();
-    ecritLigneSuivante((char *)"calend OK");
+    ecritLigneSuivante(0, (char *)"calend OK");
     initTemperatures();
-    ecritLigneSuivante((char *)"temp OK");
+    ecritLigneSuivante(0, (char *)"temp OK");
     initChaudiere();
     Serial.print("handleWebRequete : ");
     if (isWifiConnected() || isApMode()){
@@ -104,10 +104,10 @@ void setup() {
     } else {
         Serial.println("NOK");
     }
-    ecritLigneSuivante(getWifiSsid());
-    ecritLigneSuivante(getIpAddress());
+    ecritLigneSuivante(0, getWifiSsid());
+    ecritLigneSuivante(0, getIpAddress());
     sprintf(tmp, "rssi : %ddb", getRSSI()); 
-    ecritLigneSuivante(tmp);
+    ecritLigneSuivante(0, tmp);
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");

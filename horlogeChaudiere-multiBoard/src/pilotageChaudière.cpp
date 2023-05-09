@@ -209,9 +209,9 @@ void handleCommandeChauffage() {
     page += "               <tr>\n";
     page += "                   <td> mode regulation </td>\n";
     if (getRegulationMode()){
-        page += "               <td align='center'> ON </td>\n";
+        page += "               <td align='center'> <a href='/switchModeRegulation'>  ON </a></td>\n";
     }else {
-        page += "               <td align='center'> OFF </td>\n";
+        page += "               <td align='center'> <a href='/switchModeRegulation'> OFF </td>\n";
     }
     page += "                   <td> OFF : seul le calendrier pilote l'allumage de la chaudiere<br> ON : la temperature regule l'allulage de la chaudiere </td>\n";
     page += "               </tr>\n";
@@ -285,6 +285,17 @@ void handleSwitchChauffageOnOff(void){
         circulateurOnOff = false;
         commandeVanneChauffage = 0;
     }
+    server.sendHeader("Location", String("/commande"), true);
+    server.send ( 302, "text/plain", "");
+}
+
+//----------------------------------------------
+//
+//      handleSwitchCModeRegulation
+//
+//----------------------------------------------
+void handleSwitchModeRegulation(void){
+    modeRegulation = !modeRegulation;
     server.sendHeader("Location", String("/commande"), true);
     server.send ( 302, "text/plain", "");
 }

@@ -9,9 +9,7 @@
 #include "wifiTools.hpp"
 #include "afficheur.hpp"
 #include "temperature.hpp"
-
-char wifiSsid[50];
-char wifiPwd[50];
+#include "ntp.hpp"
 
 #define LOOP_DELAY 250
 
@@ -31,11 +29,14 @@ void setup() {
         delay(10);
     }
 
-    strcpy(wifiSsid, localWifiSsid);
-    strcpy(wifiPwd, localWifiPwd);
-    initWifi((char *)wifiSsid, (char *)wifiPwd);
-    initTemperature();
     initAfficheur();
+    ecritLigneSuivante((char *)"Afficheur OK");
+    initWifi();
+    ecritLigneSuivante((char *)"wifi OK");
+    initNtp();
+    ecritLigneSuivante((char *)"ntp OK");
+    initTemperatures();
+    ecritLigneSuivante((char *)"temp OK");
 }
 
 //=================================================
@@ -44,8 +45,10 @@ void setup() {
 //
 //=================================================
 void loop() {
-  refreshWifi();
   refreshAfficheur();
   refreshTemperature();
+  if (isWifiConnected() || isApMode()){
+    handleWebRequete();
+  }
   delay(LOOP_DELAY);
 }

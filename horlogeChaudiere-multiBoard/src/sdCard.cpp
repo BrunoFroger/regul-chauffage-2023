@@ -133,7 +133,7 @@ void setEnvironnement(String envName){
     for (int i = 0 ; i < NB_ENVIRONNEMENTS ; i++){
         structEnvironnement *env = &listeEnvironnement[i];
         if (envName = env->nom){
-            setIPCapteurTemperature(env->ipTempInt);
+            setIPCapteurTemperatureInterieure(env->ipTempInt);
             return;
         }
     }

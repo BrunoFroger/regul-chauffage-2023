@@ -23,7 +23,7 @@
     extern bool temperatureAtteinte(void);
     extern char *getTemperatureSring(int temperature);
     extern int updateTemperature(int *ptrTemp, char *newValue);
-    extern char *getIPCapteurTemperature(void);
-    extern void setIPCapteurTemperature(char *);
+    extern char *getIPCapteurTemperatureInterieure(void);
+    extern void setIPCapteurTemperatureInterieure(char *);
 
 #endif

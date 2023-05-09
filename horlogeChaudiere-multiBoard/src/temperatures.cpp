@@ -33,7 +33,7 @@
 int temperatureInterieure;
 int temperatureExterieure;
 int consigneTemperature = -1;
-char localIPCapteurTemperature[50] = "";
+char localIPCapteurTemperatureInterieure[50] = "";
 
 char baseUrl[50] = "/getTemperatureInterieure";
 int delayRefreshTemperatures = 5000;
@@ -53,8 +53,8 @@ WiFiClient client;
     if (consigneTemperature == -1){
         consigneTemperature = consigneReferenceJour;
     }
-    if (strcmp(localIPCapteurTemperature, "") == 0){
-        strcpy(localIPCapteurTemperature, IPcapteurTemperature);
+    if (strcmp(localIPCapteurTemperatureInterieure, "") == 0){
+        strcpy(localIPCapteurTemperatureInterieure, IPcapteurTemperature);
     }
 }
 
@@ -105,7 +105,7 @@ void refreshTemperatures(void){
         if (isWifiConnected()){
             char ligne[300];
             char url[200];
-            sprintf(url, "http://%s%s", localIPCapteurTemperature, baseUrl);
+            sprintf(url, "http://%s%s", localIPCapteurTemperatureInterieure, baseUrl);
             http.begin(client, url);
             //http.begin(client, IPcapteurTemperature, 80, baseUrl);
             int httpCode = http.GET();
@@ -193,8 +193,8 @@ int getConsigne(void){
 //      getIPCapteurTemperature
 //
 //----------------------------------------------
-char *getIPCapteurTemperature(void){
-    return localIPCapteurTemperature;
+char *getIPCapteurTemperatureInterieure(void){
+    return localIPCapteurTemperatureInterieure;
 }
 
 //----------------------------------------------
@@ -202,8 +202,8 @@ char *getIPCapteurTemperature(void){
 //      setIPCapteurTemperature
 //
 //----------------------------------------------
-void setIPCapteurTemperature(char *adresse){
-    strcpy(localIPCapteurTemperature, adresse);
+void setIPCapteurTemperatureInterieure(char *adresse){
+    strcpy(localIPCapteurTemperatureInterieure, adresse);
 }
 
 //----------------------------------------------

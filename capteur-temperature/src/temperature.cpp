@@ -5,21 +5,50 @@
 //----------------------------------------------
 
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 
 #include "wifiTools.hpp"
 
-#define PIN_TEMPERATURE A0
-int temperature;
+#define PIN_TEMPERATURE_INT A0
+#define PIN_TEMPERATURE_EXT 35
+
+int temperatureInterieure;
+int temperatureExterieure;
+int consigne;
 
 //----------------------------------------------
 //
-//      getTemperature
+//      getTemperatureInterieure
 //
 //----------------------------------------------
-int getTemperature(void){
-    return temperature;
+int getTemperatureInterieure(void){
+    return temperatureInterieure;
+}
+
+//----------------------------------------------
+//
+//      getTemperatureExterieure
+//
+//----------------------------------------------
+int getTemperatureExterieure(void){
+    return temperatureExterieure;
+}
+
+//----------------------------------------------
+//
+//      getConsigne
+//
+//----------------------------------------------
+int getConsigne(void){
+    return consigne;
+}
+
+//----------------------------------------------
+//
+//      setConsigne
+//
+//----------------------------------------------
+void setConsigne(int valeur){
+    consigne = valeur;
 }
 
 //----------------------------------------------
@@ -27,8 +56,9 @@ int getTemperature(void){
 //      initTemperature
 //
 //----------------------------------------------
-void initTemperature(void){
-    pinMode(PIN_TEMPERATURE,INPUT_PULLUP);
+void initTemperatures(void){
+    pinMode(PIN_TEMPERATURE_INT,INPUT_PULLUP);
+    pinMode(PIN_TEMPERATURE_EXT,INPUT_PULLUP);
 }
 
 //----------------------------------------------
@@ -39,10 +69,10 @@ void initTemperature(void){
 void handleGetTemeratureInterieure(void)
 {
     Serial.print("requete de temperature interieure recue => ");
-    Serial.println(temperature);
+    Serial.println(temperatureInterieure);
     String page = "";
     page += "temperatureInt=";
-    page += temperature;
+    page += temperatureInterieure;
     //page += "\n";
     //page += "\n";
     server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
@@ -56,5 +86,6 @@ void handleGetTemeratureInterieure(void)
 //----------------------------------------------
 void refreshTemperature(void){
     // temperature en 1/10 de degres
-    temperature = map(analogRead(PIN_TEMPERATURE), 0, 1024, -100, 500);
+    temperatureInterieure = map(analogRead(PIN_TEMPERATURE_INT), 0, 1024, -100, 500);
+    temperatureExterieure = map(analogRead(PIN_TEMPERATURE_EXT), 0, 1024, -100, 500);
 }

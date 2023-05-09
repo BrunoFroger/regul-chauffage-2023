@@ -14,6 +14,7 @@
     extern bool getCirculateurOnOff(void);
     extern void handleCommandeChauffage();
     extern void handleSwitchChauffageOnOff(void);
+    extern void handleSwitchModeRegulation(void);
     extern bool getChauffageOnOff();
     extern void setChauffageOnOff(bool onOff);
     extern int getCommandeVanneChauffage();

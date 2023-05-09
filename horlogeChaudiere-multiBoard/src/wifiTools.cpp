@@ -203,7 +203,7 @@ void handleRoot() {
     page += "        <li> gestion des donnees de <a href='/config'>configuration</a> de la carte SD\n";
     page += "        </p>\n";
     page += "        <p>l'arduino capteur de temperature est a l'adresse : ";
-    page +=          getIPCapteurTemperature();
+    page +=          getIPCapteurTemperatureInterieure();
     page += "        </p>\n";
     page += "        <p>Qualité du signal Wifi (RSSI) : ";
     page +=          getRSSI();
@@ -335,6 +335,7 @@ bool connectWifi(void){
     server.on("/calendrier", pageCalendrier);
     server.on("/switchChauffageOnOff", handleSwitchChauffageOnOff);
     server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
+    server.on("/switchModeRegulation", handleSwitchModeRegulation);
     server.on("/switchPlageOnOff", handleSwitchPlageOnOff);
     server.on("/editeHeurePlage", handleEditHeurePlage);
     server.on("/updatePlage", handleUpdatePlage);
