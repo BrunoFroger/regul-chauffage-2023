@@ -355,6 +355,7 @@ bool connectWifi(void){
     server.on("/chargeCalendrier", handleChargeCalendrier);
     server.on("/selectEnvironnement", handleSelectEnvironnement);
     server.on("/listFichierConfig", handleListFichierConfiguration);
+    server.on("/updateIpTempInt", handleUpdateIpTempInt);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");

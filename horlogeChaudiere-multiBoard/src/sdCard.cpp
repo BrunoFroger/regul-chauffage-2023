@@ -483,6 +483,7 @@ void handleSauveConfig(void){
 //
 //----------------------------------------------
 void handleConfig(void){
+    char ligne[100];
     Serial.println("affichage page configuration");
     String page = "<!DOCTYPE html>\n";
     page += "<style type=\"text/css\">\n";
@@ -555,6 +556,15 @@ void handleConfig(void){
     } else {
         page += "                  OFF\n";
     }
+    page += "                   </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td>Adresse capteur temp interieure</td>\n";
+    page += "                   <td>";
+    page += "                       <form action='/updateIpTempInt'>";
+    sprintf(ligne, "<input id='ipTempInt' name='ipTempInt' value=%s>\n", getIPCapteurTemperatureInterieure());
+    page +=                             ligne;
+    page += "                       </form>";
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "           </tbody>\n";
@@ -712,4 +722,15 @@ void setWifiMode(char *ssid,int available){
             return;
         }
     }
+}
+
+//----------------------------------------------
+//
+//      handleUpdateIpTempInt
+//
+//----------------------------------------------
+void handleUpdateIpTempInt(void){
+    setIPCapteurTemperatureInterieure((char *)server.arg("ipTempInt").c_str());
+    server.sendHeader("Location", String("/config"), true);
+    server.send ( 302, "text/plain", "");
 }
