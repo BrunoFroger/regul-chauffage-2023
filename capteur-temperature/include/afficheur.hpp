@@ -12,7 +12,8 @@
     extern void setAfficheurOnOff(bool state);
     extern bool getAfficheurOnOff();
     extern void switchAfficheurOnOff(void);
-    extern void ecritLigneSuivante(char *texte);
-    extern void ecritLigne(int numLigne, char *texte);
+    extern void switchEcranAfficheur(void);
+    extern void ecritLigneSuivante(int ecran, char *texte);
+    extern void ecritLigne(int ecran, int numLigne, char *texte);
 
 #endif

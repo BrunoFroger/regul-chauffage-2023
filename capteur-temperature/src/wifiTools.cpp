@@ -302,6 +302,7 @@ bool connectWifi(void){
     server.on("/", handleRoot);
     server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
     server.on("/getTemperatureInterieure", handleGetTemeratureInterieure);
+    server.on("/getTemperatureExterieure", handleGetTemeratureExterieure);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");

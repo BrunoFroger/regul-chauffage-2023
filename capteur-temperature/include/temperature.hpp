@@ -15,5 +15,6 @@
     extern int getConsigne(void);
     extern void setConsigne(int valeur);
     extern void handleGetTemeratureInterieure(void);
+    extern void handleGetTemeratureExterieure(void);
 
 #endif

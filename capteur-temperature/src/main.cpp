@@ -10,8 +10,9 @@
 #include "afficheur.hpp"
 #include "temperature.hpp"
 #include "ntp.hpp"
+#include "roueCodeuse.hpp"
 
-#define LOOP_DELAY 250
+#define LOOP_DELAY 10
 
 //=================================================
 //
@@ -30,13 +31,15 @@ void setup() {
     }
 
     initAfficheur();
-    ecritLigneSuivante((char *)"Afficheur OK");
+    ecritLigneSuivante(0, (char *)"Afficheur OK");
     initWifi();
-    ecritLigneSuivante((char *)"wifi OK");
+    ecritLigneSuivante(0, (char *)"wifi OK");
     initNtp();
-    ecritLigneSuivante((char *)"ntp OK");
+    ecritLigneSuivante(0, (char *)"ntp OK");
     initTemperatures();
-    ecritLigneSuivante((char *)"temp OK");
+    ecritLigneSuivante(0, (char *)"temp OK");
+    initRoueCodeuse();
+    ecritLigneSuivante(0, (char *)"roue OK");
 }
 
 //=================================================
@@ -50,5 +53,6 @@ void loop() {
   if (isWifiConnected() || isApMode()){
     handleWebRequete();
   }
+  refreshRoueCodeuse();
   delay(LOOP_DELAY);
 }
