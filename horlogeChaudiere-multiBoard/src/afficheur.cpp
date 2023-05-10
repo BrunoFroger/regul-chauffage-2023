@@ -14,7 +14,7 @@
 #include "temperatures.hpp"
 #include "pilotageChaudiere.hpp"
 
-#define NB_ECRANS    2
+#define NB_ECRANS    3
 
 int cptValeurs=0;
 int delayRefreshAfficheur = 3000;
@@ -153,7 +153,18 @@ void initAfficheur(void){
 
 //----------------------------------------------
 //
-//      refreshAfficheur.cpp
+//      clearBufferEcran
+//
+//----------------------------------------------
+void clearBufferEcran(int ecran){
+    for (int i = 0 ; i < nbLignesDisponibles ; i++){
+        strcpy(bufferLignesEcran[ecran][i], (char*)"");
+    }
+}
+
+//----------------------------------------------
+//
+//      refreshAfficheur
 //
 //----------------------------------------------
 void refreshAfficheur(void){
@@ -165,9 +176,8 @@ void refreshAfficheur(void){
             //Serial.println("refresh afficheur");
             lastRefreshAfficheur = millis();
             int idx=0;
-            //sprintf(bufferLignes[idx++], "  Chaudiere");
+            clearBufferEcran(ecranCourant);
             sprintf(bufferLignesEcran[ecranCourant][idx++], "%s  (%d/%d)",getFormatedTime(), ecranCourant + 1, NB_ECRANS);
-            sprintf(bufferLignesEcran[ecranCourant][idx++], "%s", getIpAddress());
             switch(ecranCourant){
                 case 0 :
                     sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
@@ -188,10 +198,17 @@ void refreshAfficheur(void){
                     }
                     break;
                 case 1 :
-                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
-                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Int  : %.1f", (double)(getTemperatureInterieure()/10));
-                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Ext  : %.1f", (double)(getTemperatureExterieure()/10));
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)getConsigne() / 10);
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Int  : %.1f", (double)getTemperatureInterieure()/10);
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "T Ext  : %.1f", (double)getTemperatureExterieure()/10);
                     sprintf(bufferLignesEcran[ecranCourant][idx++], "Pompe  : %d", getCommandeVanneChauffage());
+                    break;
+                case 2 :
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "IP locale");
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "%s", getIpAddress());
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "IP T int");
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "%s", getIPCapteurTemperatureInterieure());
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "rssi : %ddb", getRSSI()); 
                     break;
             }
             u8g2.clearDisplay();

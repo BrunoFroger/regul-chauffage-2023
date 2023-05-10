@@ -53,9 +53,6 @@ WiFiClient client;
     if (consigneTemperature == -1){
         consigneTemperature = consigneReferenceJour;
     }
-    if (strcmp(localIPCapteurTemperatureInterieure, "") == 0){
-        strcpy(localIPCapteurTemperatureInterieure, localIPCapteurTemperatureInterieure);
-    }
 }
 
 //----------------------------------------------
@@ -74,6 +71,16 @@ void setTemperatureInterieure(int temp){
         temperatureInterieure=temp;
     }
     Serial.print("setTemperatureInterieure => "); Serial.println(temperatureInterieure);
+}
+
+//----------------------------------------------
+//
+//      setTemperatureInterieure
+//
+//----------------------------------------------
+void setTemperatureExterieure(int temp){
+    temperatureExterieure=temp;
+    Serial.print("setTemperatureExterieure => "); Serial.println(temperatureExterieure);
 }
 
 //----------------------------------------------
@@ -101,34 +108,49 @@ void refreshTemperatures(void){
     tmp = millis() - lastRefreshTemperatures;
     //Serial.println(tmp);
     if (tmp > delayRefreshTemperatures){
+        Serial.println("refresh temperature");
         lastRefreshTemperatures = millis();
-        if (isWifiConnected()){
-            char ligne[300];
-            char url[200];
-            sprintf(url, "http://%s%s", localIPCapteurTemperatureInterieure, baseUrl);
-            http.begin(client, url);
-            //http.begin(client, IPcapteurTemperature, 80, baseUrl);
-            int httpCode = http.GET();
-            // httpCode will be negative on error
-            if (httpCode >= 0) {
-                // HTTP header has been send and Server response header has been handled
-                //sprintf(ligne, "[HTTP] GET %s => code:%d", url, httpCode); Serial.println(ligne);
-                char payload[50];
-
-                strcpy(payload, http.getString().c_str());
-                //Serial.print("payload="); Serial.println(payload);
-                char * pch;
-                pch = strchr(payload, '=');
-                //Serial.print("temperature=<"); Serial.print(pch+1);Serial.println(">");
-                setTemperatureInterieure(atoi(pch+1));
-
-                //Serial.println(payload);
+        if (strcmp(getIPCapteurTemperatureInterieure(), "") != 0){
+            if (isWifiConnected()){
+                char ligne[300];
+                char url[200];
+                sprintf(url, "http://%s%s", localIPCapteurTemperatureInterieure, baseUrl);
+                Serial.print("envoi requete : "); Serial.println(url);
+                http.begin(client, url);
+                //http.begin(client, IPcapteurTemperature, 80, baseUrl);
+                int httpCode = http.GET();
+                // httpCode will be negative on error
+                if (httpCode >= 0) {
+                    // HTTP header has been send and Server response header has been handled
+                    sprintf(ligne, "[HTTP] GET %s => code:%d", url, httpCode); Serial.println(ligne);
+                    String payload, variable, valeur;
+                    int idx;
+                    payload = http.getString();
+                    Serial.print("payload="); Serial.println(payload);
+                    idx = payload.indexOf('=');
+                    variable = payload.substring(0, idx);
+                    Serial.print("variable="); Serial.println(variable);
+                    if (variable.equals("temperatureInt")){
+                        valeur = payload.substring(idx+1);
+                        Serial.print("valeur="); Serial.println(valeur);
+                        setTemperatureInterieure(valeur.toInt());
+                    }
+                    if (variable.equals("temperatureExt")){
+                        valeur = payload.substring(idx+1);
+                        Serial.print("valeur="); Serial.println(valeur);
+                        setTemperatureExterieure(valeur.toInt());
+                    }
+                } else {
+                    sprintf(ligne, "[HTTP] GET %s => failed:%s", url, http.errorToString(httpCode).c_str()); Serial.println(ligne);
+                }
+                http.end();
+                Serial.print("fin refresh temperature\n");
+                //delay(1000);
             } else {
-                sprintf(ligne, "[HTTP] GET %s => failed:%s", url, http.errorToString(httpCode).c_str()); Serial.println(ligne);
+                Serial.println("Impossible recuperer temperature exterieure : wifi non connecte");
             }
-            http.end();
-            //Serial.print("fin refresh temperature\n");
-            //delay(1000);
+        } else {
+            Serial.println("Impossible recuperer temperature exterieure : IP vide");
         }
     }
 }
