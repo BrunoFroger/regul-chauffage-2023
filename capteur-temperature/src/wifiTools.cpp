@@ -155,6 +155,7 @@ void handleSwitchAfficheurOnOff(void){
 //
 //----------------------------------------------
 void handleRoot() {
+    char tmp[20];
     Serial.println("affichage page root");
     String page = "<!DOCTYPE html>\n";
     page += "<style type=\"text/css\">\n";
@@ -189,15 +190,43 @@ void handleRoot() {
     page += "    <div>\n";
 
     page += "    <div class='w3-center w3-padding-16'>\n";
-    page += "        <p>Temperature interieure : ";
-    page +=          getTemperatureInterieure();
-    page += "        db</p>\n";
-    page += "        <p>Temperature exterieure : ";
-    page +=          getTemperatureExterieure();
-    page += "        db</p>\n";
-    page += "        <p>Qualité du signal Wifi (RSSI) : ";
-    page +=          getRSSI();
-    page += "        db</p>\n";
+    page += "    <table>";
+    page += "       <tr>";
+    page += "           <td>";
+    page += "               Consigne : ";
+    page += "           </td>";
+    page += "           <td>";
+    sprintf(tmp, "%.1f", (double)getConsigne()/10);
+    page +=                 tmp;
+    page += "           </td>";
+    page += "       </tr>";
+    page += "       <tr>";
+    page += "           <td>";
+    page += "               Temperature interieure";
+    page += "           </td>";
+    page += "           <td>";
+    sprintf(tmp, "%.1f", (double)getTemperatureInterieure()/10);
+    page +=                 tmp;
+    page += "           </td>";
+    page += "       </tr>";
+    page += "       <tr>";
+    page += "           <td>";
+    page += "               Temperature exterieure";
+    page += "           </td>";
+    page += "           <td>";
+    sprintf(tmp, "%.1f", (double)getTemperatureExterieure()/10);
+    page +=                 tmp;
+    page += "           </td>";
+    page += "       </tr>";
+    page += "       <tr>";
+    page += "           <td>";
+    page += "               Qualité du signal Wifi (RSSI)";
+    page += "           </td>";
+    page += "           <td>";
+    page +=                 getRSSI();
+    page += "           db</td>";
+    page += "       </tr>";
+    page += "    </table>";
     page += "    </div>\n";
     page +=      piedDePage;
 
