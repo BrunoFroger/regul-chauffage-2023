@@ -211,66 +211,6 @@ void chargeCalendrier(){
 
 //----------------------------------------------
 //
-//      initCalendrier
-//
-//----------------------------------------------
-void initCalendrier(void){
-    Serial.println("======================");
-    Serial.println("     Init Calendrier ");
-    Serial.println("----------------------");
-    Serial.println("initialisation des donnees calendrier");
-    Serial.print ("la taille du calendrier est : ");
-    Serial.println(sizeof(calendrier));
-
-    // plage modele NUIT
-    setPlageNuit(&calendrier.plagesModeles[PLAGE_MODELE_NUIT]);
-    // plage modele LEVER
-    setPlageLever(&calendrier.plagesModeles[PLAGE_MODELE_LEVER]);
-    // plage modele COUCHER
-    setPlageCoucher(&calendrier.plagesModeles[PLAGE_MODELE_COUCHER]);
-    // plage modele ALL
-    setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
-    // plage modele JOURNEE
-    setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
-    //Serial.print(listeDonneesCalendrier());
-    // plage modele ABSCENT
-    setPlageAbsent(&calendrier.plagesModeles[PLAGE_MODELE_ABSENT]);
-    //Serial.print(listeDonneesCalendrier());
-
-    for (int i = 0 ; i < NB_PLAGES_USER ; i++){
-        char nomPlage[20];
-        sprintf(nomPlage, "user_%d", i);
-        setPlage(&calendrier.plagesUtilisateur[i],-1,nomPlage,-1,-1,-1,-1,0,-1,0);
-    }
-
-    if (1){
-        chargeCalendrier();
-    } else {
-        for (int j = 0 ; j < NB_JOURS ; j++){
-            for (int i = 0 ; i < NB_PLAGES_PAR_JOUR - 1; i++){
-                calendrier.plagesHoraires[j][i].modele = -1;
-                calendrier.plagesHoraires[j][i].heureDebut = -1;
-                calendrier.plagesHoraires[j][i].minuteDebut = -1;
-                calendrier.plagesHoraires[j][i].heureFin = -1;
-                calendrier.plagesHoraires[j][i].minuteFin = -1;
-                calendrier.plagesHoraires[j][i].chauffageOnOff = false;
-                calendrier.plagesHoraires[j][i].consigne = -1;
-                calendrier.plagesHoraires[j][i].plageActive = false;
-            }
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].modele = 0;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].heureDebut = 0;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].minuteDebut = 0;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].heureFin = 23;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].minuteFin = 59;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].chauffageOnOff = false;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].consigne = consigneReferenceJour;
-            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].plageActive = true;
-        }
-    }
-}
-
-//----------------------------------------------
-//
 //      getSizeofCalendrier
 //
 //----------------------------------------------
@@ -555,19 +495,7 @@ void handleEditHeurePlage() {
     Serial.print(", fin = ");
     Serial.println(ancienFin);
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -661,19 +589,7 @@ void pageCalendrier() {
     char ligne[200];
     Serial.println("affichage page calendrier");
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -919,4 +835,73 @@ String listeDonneesCalendrier(void){
     }
     //Serial.print(page);
     return page;
+}
+
+
+//----------------------------------------------
+//
+//      initCalendrier
+//
+//----------------------------------------------
+void initCalendrier(void){
+    Serial.println("======================");
+    Serial.println("     Init Calendrier ");
+    Serial.println("----------------------");
+    Serial.println("initialisation des donnees calendrier");
+    Serial.print ("la taille du calendrier est : ");
+    Serial.println(sizeof(calendrier));
+
+    // plage modele NUIT
+    setPlageNuit(&calendrier.plagesModeles[PLAGE_MODELE_NUIT]);
+    // plage modele LEVER
+    setPlageLever(&calendrier.plagesModeles[PLAGE_MODELE_LEVER]);
+    // plage modele COUCHER
+    setPlageCoucher(&calendrier.plagesModeles[PLAGE_MODELE_COUCHER]);
+    // plage modele ALL
+    setPlageAll(&calendrier.plagesModeles[PLAGE_MODELE_ALL]);
+    // plage modele JOURNEE
+    setPlageJournee(&calendrier.plagesModeles[PLAGE_MODELE_JOUNEE]);
+    //Serial.print(listeDonneesCalendrier());
+    // plage modele ABSCENT
+    setPlageAbsent(&calendrier.plagesModeles[PLAGE_MODELE_ABSENT]);
+    //Serial.print(listeDonneesCalendrier());
+
+    for (int i = 0 ; i < NB_PLAGES_USER ; i++){
+        char nomPlage[20];
+        sprintf(nomPlage, "user_%d", i);
+        setPlage(&calendrier.plagesUtilisateur[i],-1,nomPlage,-1,-1,-1,-1,0,-1,0);
+    }
+
+    if (1){
+        chargeCalendrier();
+    } else {
+        for (int j = 0 ; j < NB_JOURS ; j++){
+            for (int i = 0 ; i < NB_PLAGES_PAR_JOUR - 1; i++){
+                calendrier.plagesHoraires[j][i].modele = -1;
+                calendrier.plagesHoraires[j][i].heureDebut = -1;
+                calendrier.plagesHoraires[j][i].minuteDebut = -1;
+                calendrier.plagesHoraires[j][i].heureFin = -1;
+                calendrier.plagesHoraires[j][i].minuteFin = -1;
+                calendrier.plagesHoraires[j][i].chauffageOnOff = false;
+                calendrier.plagesHoraires[j][i].consigne = -1;
+                calendrier.plagesHoraires[j][i].plageActive = false;
+            }
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].modele = 0;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].heureDebut = 0;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].minuteDebut = 0;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].heureFin = 23;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].minuteFin = 59;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].chauffageOnOff = false;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].consigne = consigneReferenceJour;
+            calendrier.plagesHoraires[j][NB_PLAGES_PAR_JOUR - 1].plageActive = true;
+        }
+    }
+    server.on("/calendrier", pageCalendrier);
+    server.on("/switchPlageOnOff", handleSwitchPlageOnOff);
+    server.on("/editeHeurePlage", handleEditHeurePlage);
+    server.on("/updatePlage", handleUpdatePlage);
+    server.on("/deletePlage", handleDeletePlage);
+    server.on("/createPlage", handleCreatePlage);
+    server.on("/sauveCalendrier", handleSauveCalendrier);
+    server.on("/chargeCalendrier", handleChargeCalendrier);
 }

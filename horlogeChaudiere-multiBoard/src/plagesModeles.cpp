@@ -22,19 +22,7 @@ void handlePlagesModeles(void){
     Serial.println("    handlePlagesModeles");
     char ligne[100];
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -160,19 +148,7 @@ void handleEditPlageModele(void) {
     char ligne[100];
     indexToUpdate = server.arg("id").toInt();
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -252,19 +228,7 @@ void handleEditPlageUser(void) {
     char ligne[100];
     indexToUpdate = server.arg("plage").toInt();
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -330,4 +294,17 @@ void handleEditPlageUser(void) {
     page += "</html>\n";  // Fin de la page HTML
     server.setContentLength(page.length());  // Permet l'affichage plus rapide après chaque clic sur les boutons
     server.send(200, "text/html", page);
+}
+
+//----------------------------------------------
+//
+//      initPlages
+//
+//----------------------------------------------
+void initPlages(void){
+    server.on("/plagesModeles", handlePlagesModeles);
+    server.on("/updatePlageModele", handleUpdatePlageModele);
+    server.on("/updatePlageUser", handleUpdatePlageUser);
+    server.on("/editPlageModele", handleEditPlageModele);
+    server.on("/editPlageUser", handleEditPlageUser);
 }

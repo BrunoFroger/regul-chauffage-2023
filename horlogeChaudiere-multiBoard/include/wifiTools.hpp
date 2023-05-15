@@ -29,6 +29,7 @@
     extern void handleWebRequete(void);
     extern String piedDePage;
     extern String enteteDePage;
+    extern String webPageStyle;
     extern String listeDonneesChauffage(void);
     extern char *getIpAddress(void);
     extern char *getWifiSsid(void);

@@ -16,9 +16,6 @@
     extern void initChaudiere(void);
     extern void refreshChaudiere(void);
     extern bool getCirculateurOnOff(void);
-    extern void handleCommandeChauffage();
-    extern void handleSwitchChauffageOnOff(void);
-    extern void handleSwitchModeRegulation(void);
     extern int getChauffageMode();
     extern char *getChauffageModeString();
     extern void setChauffageMode(int mode);

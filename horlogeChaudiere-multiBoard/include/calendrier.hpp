@@ -44,15 +44,6 @@
     extern void refreshCalendrier(void);
     extern void pageCalendrier(void);
     extern bool getChauffageStatus(void);
-    extern void handleSwitchPlageOnOff();
-    extern void handleEditHeurePlage(void);
-    extern void handleUpdatePlage(void);
-    extern void handleDeletePlage(void);
-    extern void handleCreatePlage(void);
-    extern void handleSauveCalendrier(void);
-    extern void handleChargeCalendrier(void);
-    extern void saveCalendrier(void);
-    extern void loadCalendrier(void);
     extern structCalendrier *getCalendrier(void);
     extern int getSizeofCalendrier(void);
     extern String listeDonneesCalendrier(void);

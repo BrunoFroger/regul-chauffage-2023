@@ -14,6 +14,7 @@
 #include "temperatures.hpp"
 #include "sdCard.hpp"
 #include "scanI2C.hpp"
+#include "plagesModeles.hpp"
 
 
 
@@ -93,6 +94,7 @@ void setup() {
         initNtp();
         ecritLigneSuivante(0, (char *)"NTP OK");
     }
+    initPlages();
     initCalendrier();
     ecritLigneSuivante(0, (char *)"calend OK");
     initTemperatures();

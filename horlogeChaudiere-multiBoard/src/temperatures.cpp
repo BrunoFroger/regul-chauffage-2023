@@ -43,20 +43,6 @@ WiFiClient client;
 
 //----------------------------------------------
 //
-//      initTemperatures
-//
-//----------------------------------------------
-  void initTemperatures(void){
-    Serial.println("=======================");
-    Serial.println("     Init Temperatures ");
-    Serial.println("-----------------------");
-    if (consigneTemperature == -1){
-        consigneTemperature = consigneReferenceJour;
-    }
-}
-
-//----------------------------------------------
-//
 //      setTemperatureInterieure
 //
 //----------------------------------------------
@@ -260,19 +246,7 @@ void handleTemperatures(void){
     Serial.println("affichage page temperatures");
     char ligne[100];
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -336,3 +310,18 @@ void handleTemperatures(void){
     server.send(200, "text/html", page);
 }
 
+//----------------------------------------------
+//
+//      initTemperatures
+//
+//----------------------------------------------
+  void initTemperatures(void){
+    Serial.println("=======================");
+    Serial.println("     Init Temperatures ");
+    Serial.println("-----------------------");
+    if (consigneTemperature == -1){
+        consigneTemperature = consigneReferenceJour;
+    }
+    server.on("/temperatures", handleTemperatures);
+    server.on("/updateConsigne", handleUpdateConsigne);
+}

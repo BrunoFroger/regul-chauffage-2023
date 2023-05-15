@@ -98,61 +98,6 @@ void ecritLigneSuivante(int ecran, char *texte){
 
 //----------------------------------------------
 //
-//      initAfficheur.cpp
-//
-//----------------------------------------------
-void initAfficheur(void){
-    Serial.println("======================");
-    Serial.println("     Init Afficheur   ");
-    Serial.println("----------------------");
-    Serial.println("initialisation LCD .....");
-    u8g2.begin();
-    u8g2.clearBuffer();
-
-    #define font_4x6_tr    0   // 6 lignes de 16 caracteres (peu lisible)
-    #define font_5x7_tr    1   // 6 lignes de 13 caracteres
-    #define font_5x8_tr    2   // 5 lignes de 13 caracteres
-    #define font_6x10_tr   3   // 4 lignes de 11 caracteres
-    int font = font_5x7_tr;
-    Serial.print("Font selectionnée : ");
-    switch(font){
-        case font_4x6_tr:
-            Serial.println("u8g2_font_4x6_tr");
-            hauteurligne=7;
-            u8g2.setFont(u8g2_font_4x6_tr);
-            nbLignesDisponibles = 6;
-            break;
-        case font_5x7_tr:
-            Serial.println("u8g2_font_5x7_tr");
-            hauteurligne=8;
-            u8g2.setFont(u8g2_font_5x7_tr);
-            nbLignesDisponibles = 6;
-            break;
-        case font_5x8_tr:
-            Serial.println("u8g2_font_5x8_tr");
-            hauteurligne=9;
-            u8g2.setFont(u8g2_font_5x8_tr);
-            nbLignesDisponibles = 5;
-            break;
-        case font_6x10_tr:
-            Serial.println("u8g2_font_6x10_tr");
-            hauteurligne=11;
-            u8g2.setFont(u8g2_font_6x10_tr);
-            nbLignesDisponibles = 4;
-            break;
-        default:
-            Serial.println("inconnue");
-    }
-    int x=hauteurligne, y=1;
-    u8g2.drawStr(0,x*y++," chaudiere");
-    u8g2.sendBuffer();
-    delay(100);
-    Serial.println("init Afficheur => fin ");
-    Serial.println("======================");
-}
-
-//----------------------------------------------
-//
 //      clearBufferEcran
 //
 //----------------------------------------------
@@ -218,4 +163,71 @@ void refreshAfficheur(void){
         u8g2.clearDisplay();
         //lcd.setBacklight(LOW); 
     }
+}
+
+//----------------------------------------------
+//
+//      handleSwitchAfficheurOnOff
+//
+//----------------------------------------------
+void handleSwitchAfficheurOnOff(void){
+    switchAfficheurOnOff();
+    server.sendHeader("Location", String("/commande"), true);
+    server.send ( 302, "text/plain", "");
+}
+
+//----------------------------------------------
+//
+//      initAfficheur.cpp
+//
+//----------------------------------------------
+void initAfficheur(void){
+    Serial.println("======================");
+    Serial.println("     Init Afficheur   ");
+    Serial.println("----------------------");
+    Serial.println("initialisation LCD .....");
+    u8g2.begin();
+    u8g2.clearBuffer();
+
+    #define font_4x6_tr    0   // 6 lignes de 16 caracteres (peu lisible)
+    #define font_5x7_tr    1   // 6 lignes de 13 caracteres
+    #define font_5x8_tr    2   // 5 lignes de 13 caracteres
+    #define font_6x10_tr   3   // 4 lignes de 11 caracteres
+    int font = font_5x7_tr;
+    Serial.print("Font selectionnée : ");
+    switch(font){
+        case font_4x6_tr:
+            Serial.println("u8g2_font_4x6_tr");
+            hauteurligne=7;
+            u8g2.setFont(u8g2_font_4x6_tr);
+            nbLignesDisponibles = 6;
+            break;
+        case font_5x7_tr:
+            Serial.println("u8g2_font_5x7_tr");
+            hauteurligne=8;
+            u8g2.setFont(u8g2_font_5x7_tr);
+            nbLignesDisponibles = 6;
+            break;
+        case font_5x8_tr:
+            Serial.println("u8g2_font_5x8_tr");
+            hauteurligne=9;
+            u8g2.setFont(u8g2_font_5x8_tr);
+            nbLignesDisponibles = 5;
+            break;
+        case font_6x10_tr:
+            Serial.println("u8g2_font_6x10_tr");
+            hauteurligne=11;
+            u8g2.setFont(u8g2_font_6x10_tr);
+            nbLignesDisponibles = 4;
+            break;
+        default:
+            Serial.println("inconnue");
+    }
+    int x=hauteurligne, y=1;
+    u8g2.drawStr(0,x*y++," chaudiere");
+    u8g2.sendBuffer();
+    server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
+    delay(100);
+    Serial.println("init Afficheur => fin ");
+    Serial.println("======================");
 }

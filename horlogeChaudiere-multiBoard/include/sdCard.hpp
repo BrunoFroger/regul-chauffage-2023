@@ -18,12 +18,12 @@
     extern void handleConfig(void);
     extern void handleSauveConfig(void);
     extern void handleSelectEnvironnement(void);
+    extern void handleListFichierConfiguration(void);
+    extern void handleUpdateIpTempInt(void);
     extern void sauvegardeFichier(String filename, String datas);
     extern String lireFichier(String filename);
-    extern void handleListFichierConfiguration(void);
     extern File sdCardOpenFile(char *filename);
     extern bool getNewSsid(void);
     extern void setWifiMode(char *ssid, int available);
-    extern void handleUpdateIpTempInt(void);
     
 #endif

@@ -48,6 +48,7 @@ char ipGateway[50];
 char netMask[50];
 String piedDePage = "";
 String enteteDePage = "";
+String webPageStyle = "";
 bool wifiConnected = false;
 
 //----------------------------------------------
@@ -144,37 +145,13 @@ void handleWebRequete(void){
 
 //----------------------------------------------
 //
-//      handleSwitchAfficheurOnOff
-//
-//----------------------------------------------
-void handleSwitchAfficheurOnOff(void){
-    switchAfficheurOnOff();
-    server.sendHeader("Location", String("/commande"), true);
-    server.send ( 302, "text/plain", "");
-}
-
-//----------------------------------------------
-//
 //      handleRoot
 //
 //----------------------------------------------
 void handleRoot() {
     Serial.println("affichage page root");
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
-
+    page += webPageStyle;
     page += "<html lang='fr'>\n";
     page += "<head>\n";
     page += enteteDePage;
@@ -332,30 +309,6 @@ bool connectWifi(void){
     server.begin();
     server.onNotFound(handlePageNotFound);
     server.on("/", handleRoot);
-    server.on("/calendrier", pageCalendrier);
-    server.on("/switchChauffageOnOff", handleSwitchChauffageOnOff);
-    server.on("/switchAfficheurOnOff", handleSwitchAfficheurOnOff);
-    server.on("/switchModeRegulation", handleSwitchModeRegulation);
-    server.on("/switchPlageOnOff", handleSwitchPlageOnOff);
-    server.on("/editeHeurePlage", handleEditHeurePlage);
-    server.on("/updatePlage", handleUpdatePlage);
-    server.on("/deletePlage", handleDeletePlage);
-    server.on("/createPlage", handleCreatePlage);
-    server.on("/commande", handleCommandeChauffage);
-    server.on("/temperatures", handleTemperatures);
-    server.on("/updateConsigne", handleUpdateConsigne);
-    server.on("/plagesModeles", handlePlagesModeles);
-    server.on("/updatePlageModele", handleUpdatePlageModele);
-    server.on("/updatePlageUser", handleUpdatePlageUser);
-    server.on("/editPlageModele", handleEditPlageModele);
-    server.on("/editPlageUser", handleEditPlageUser);
-    server.on("/config", handleConfig);
-    server.on("/sauveConfig", handleSauveConfig);
-    server.on("/sauveCalendrier", handleSauveCalendrier);
-    server.on("/chargeCalendrier", handleChargeCalendrier);
-    server.on("/selectEnvironnement", handleSelectEnvironnement);
-    server.on("/listFichierConfig", handleListFichierConfiguration);
-    server.on("/updateIpTempInt", handleUpdateIpTempInt);
     Serial.println("======================");
 
     Serial.println("connectWifi => fin");
@@ -397,6 +350,51 @@ bool initWifi(void){
     piedDePage +=          copyright;
     piedDePage +=          "</i>\n";
     piedDePage += "    </div>\n";
+
+    // 
+    //  Definition du style de page
+    //
+    webPageStyle = "<style>";
+    webPageStyle += "	table {";
+    webPageStyle += "  		padding: 10px;";
+    webPageStyle += "  		border: 1px solid black;";
+    webPageStyle += "		border-collapse: collapse;";
+	webPageStyle += "		width:100%;";
+    webPageStyle += "		height:100%;";
+	webPageStyle += "	}";
+    webPageStyle += "	th, td {";
+    webPageStyle += "  		padding: 10px;";
+    webPageStyle += "  		border: 1px solid black;";
+    webPageStyle += "		border-collapse: collapse;";
+	webPageStyle += "	}";
+    webPageStyle += "	html{";
+	webPageStyle += "		margin-left:5%;";
+    webPageStyle += "		margin-right:15%;";
+    webPageStyle += "		margin-down:15%;";
+	webPageStyle += "		width:100%;";
+    webPageStyle += "		font-size:40px;";
+    webPageStyle += "   }";
+    webPageStyle += "	body{";
+	webPageStyle += "		margin-left:5%;";
+    webPageStyle += "		margin-right:5%;";
+	webPageStyle += "		width:90%;";
+    webPageStyle += "		height:100%;";
+    webPageStyle += "   }";
+	webPageStyle += "	div{";
+	webPageStyle += "		width:100%;";
+    webPageStyle += "		height:100%;";
+    webPageStyle += "		margin-left:auto;";
+    webPageStyle += "		margin-right:auto;";
+    webPageStyle += "	}";
+	webPageStyle += "	button, select{";
+    webPageStyle += "		margin-left:auto;";
+    webPageStyle += "		margin-right:auto;";
+    webPageStyle += "		font-size:40px;";
+    webPageStyle += "	}";
+    webPageStyle += "</style>";
+    webPageStyle += "<head>";
+    webPageStyle += "   <meta charset='utf8'>";
+    webPageStyle += "</head>";
 
     // 
     //  Definition de l'entete de page

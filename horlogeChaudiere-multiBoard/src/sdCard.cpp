@@ -463,6 +463,11 @@ bool sdcardInit(void){
     }
     listeEnvironnements();
     SDCardInitOK=true;
+    server.on("/config", handleConfig);
+    server.on("/sauveConfig", handleSauveConfig);
+    server.on("/selectEnvironnement", handleSelectEnvironnement);
+    server.on("/listFichierConfig", handleListFichierConfiguration);
+    server.on("/updateIpTempInt", handleUpdateIpTempInt);
     return true;
 }
 
@@ -486,19 +491,7 @@ void handleConfig(void){
     char ligne[100];
     Serial.println("affichage page configuration");
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
@@ -644,19 +637,7 @@ void handleListFichierConfiguration(void){
     myFile = SD.open(filename);
 
     String page = "<!DOCTYPE html>\n";
-    page += "<style type=\"text/css\">\n";
-    page += "    table, th, td {\n";
-    page += "        padding: 10px;\n";
-    page += "        border: 1px solid black;\n";
-    page += "        border-collapse: collapse;\n";
-    page += "    }\n";
-    page += "    body{\n";
-    page += "        margin-left:5%;margin-right:5%; }div#global{width:100%;\n";
-    page += "    }\n";
-    page += "    div{\n";
-    page += "        width:100%; height:200%;margin-left:auto;margin-right:auto;max-width:2000px;\n";
-    page += "    }\n";
-    page += "</style>\n";
+    page += webPageStyle;
 
     page += "<html lang='fr'>\n";
     page += "<head>\n";
