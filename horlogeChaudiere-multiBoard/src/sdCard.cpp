@@ -424,55 +424,6 @@ void writeConfig(void){
 
 //----------------------------------------------
 //
-//      sdcardInit
-//
-//----------------------------------------------
-bool sdcardInit(void){
-
-    Serial.print("Initializing SD card  ...   ");
-    insideEnvironnement=false;
-    for (int i = 0 ; i < 10 ; i++){
-        strcpy(listeEnvironnement[i].nom, "");
-    }
-    //listeEnvironnements();
-
-#ifdef lolin_s2_mini
-    if (!SD.begin(chipSelect)) {
-# else 
-    if (!SD.begin()) {
-# endif
-        Serial.println("initialization failed!");
-        SDCardInitOK=false;
-        return false;
-    }
-    Serial.println("initialization done.");
-    readConfig();
-    Serial.print("consigne        = ");
-    Serial.println(getConsigne());
-    Serial.print("chauffage       = ");
-    Serial.println(getChauffageModeString());
-    Serial.print("environnement   = ");
-    Serial.println(environnement);
-    Serial.print("pin relai       = ");
-    Serial.println(getPinRelai());
-    Serial.print("mode regulation = ");
-    if (getRegulationMode()) {
-        Serial.println("ON");
-    } else {
-        Serial.println("OFF");
-    }
-    listeEnvironnements();
-    SDCardInitOK=true;
-    server.on("/config", handleConfig);
-    server.on("/sauveConfig", handleSauveConfig);
-    server.on("/selectEnvironnement", handleSelectEnvironnement);
-    server.on("/listFichierConfig", handleListFichierConfiguration);
-    server.on("/updateIpTempInt", handleUpdateIpTempInt);
-    return true;
-}
-
-//----------------------------------------------
-//
 //      handleSauveConfig
 //
 //----------------------------------------------
@@ -710,4 +661,53 @@ void handleUpdateIpTempInt(void){
     setIPCapteurTemperatureInterieure((char *)server.arg("ipTempInt").c_str());
     server.sendHeader("Location", String("/config"), true);
     server.send ( 302, "text/plain", "");
+}
+
+//----------------------------------------------
+//
+//      sdcardInit
+//
+//----------------------------------------------
+bool sdcardInit(void){
+
+    Serial.print("Initializing SD card  ...   ");
+    insideEnvironnement=false;
+    for (int i = 0 ; i < 10 ; i++){
+        strcpy(listeEnvironnement[i].nom, "");
+    }
+    //listeEnvironnements();
+
+#ifdef lolin_s2_mini
+    if (!SD.begin(chipSelect)) {
+# else 
+    if (!SD.begin()) {
+# endif
+        Serial.println("initialization failed!");
+        SDCardInitOK=false;
+        return false;
+    }
+    Serial.println("initialization done.");
+    readConfig();
+    Serial.print("consigne        = ");
+    Serial.println(getConsigne());
+    Serial.print("chauffage       = ");
+    Serial.println(getChauffageModeString());
+    Serial.print("environnement   = ");
+    Serial.println(environnement);
+    Serial.print("pin relai       = ");
+    Serial.println(getPinRelai());
+    Serial.print("mode regulation = ");
+    if (getRegulationMode()) {
+        Serial.println("ON");
+    } else {
+        Serial.println("OFF");
+    }
+    listeEnvironnements();
+    SDCardInitOK=true;
+    server.on("/config", handleConfig);
+    server.on("/sauveConfig", handleSauveConfig);
+    server.on("/selectEnvironnement", handleSelectEnvironnement);
+    server.on("/listFichierConfig", handleListFichierConfiguration);
+    server.on("/updateIpTempInt", handleUpdateIpTempInt);
+    return true;
 }

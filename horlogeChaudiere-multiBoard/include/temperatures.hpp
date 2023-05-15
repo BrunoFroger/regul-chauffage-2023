@@ -14,12 +14,9 @@
     extern void initTemperatures(void);
     extern void refreshTemperatures(void);
     extern void setConsigne(int consigne);
-    extern void handleReceiveTemeratureInterieure(void);
     extern int getTemperatureInterieure(void);
     extern int getTemperatureExterieure(void);
     extern int getConsigne(void);
-    extern void handleTemperatures(void);
-    extern void handleUpdateConsigne(void);
     extern bool temperatureAtteinte(void);
     extern char *getTemperatureSring(int temperature);
     extern int updateTemperature(int *ptrTemp, char *newValue);
