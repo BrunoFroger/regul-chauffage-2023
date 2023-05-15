@@ -32,7 +32,7 @@ File myFile;
 String environnement;
 bool insideEnvironnement;
 int pin_relai;
-bool SdChauffageOnOff;
+int SdChauffageOnOff;
 int SdConsigne;
 boolean SDCardInitOK=false;
 
@@ -211,12 +211,16 @@ void analyseLigne(String ligne){
         //Serial.print("ip temp int = <"); Serial.print(env->ipTempInt); Serial.println(">");
     } else if (ligne.startsWith("CHAUFFAGE")){
         // fixe l'activation ou non du chauffage
-        if (tmpData == "ON"){
-            SdChauffageOnOff = true;
+        if (tmpData == "FORCE"){
+            SdChauffageOnOff = MODE_CHAUFFAGE_FORCE;
+        } else if (tmpData == "OFF"){
+            SdChauffageOnOff = MODE_CHAUFFAGE_OFF;
+        } else if (tmpData == "PROG"){
+            SdChauffageOnOff = MODE_CHAUFFAGE_PROG;
         } else {
-            SdChauffageOnOff = false;
+            SdChauffageOnOff = MODE_CHAUFFAGE_OFF;
         }
-        setChauffageOnOff(SdChauffageOnOff);
+        setChauffageMode(SdChauffageOnOff);
     } else if (ligne.startsWith("PIN_RELAI")){
         // fixe la broche sur laquelle est connectee le relai de pilotage
         //Serial.print("AnalyseLigne : pinRelai = "); Serial.println(tmpData.toInt());
@@ -446,11 +450,7 @@ bool sdcardInit(void){
     Serial.print("consigne        = ");
     Serial.println(getConsigne());
     Serial.print("chauffage       = ");
-    if (getChauffageOnOff()) {
-        Serial.println("ON");
-    } else {
-        Serial.println("OFF");
-    }
+    Serial.println(getChauffageModeString());
     Serial.print("environnement   = ");
     Serial.println(environnement);
     Serial.print("pin relai       = ");
@@ -551,11 +551,7 @@ void handleConfig(void){
     page += "               <tr>\n";
     page += "                   <td>chauffage</td>\n";
     page += "                   <td>";
-    if (getChauffageOnOff()){
-        page += "                  ON\n";
-    } else {
-        page += "                  OFF\n";
-    }
+    page +=                         getChauffageModeString();
     page += "                   </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";

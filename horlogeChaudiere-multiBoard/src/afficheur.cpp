@@ -181,11 +181,7 @@ void refreshAfficheur(void){
             switch(ecranCourant){
                 case 0 :
                     sprintf(bufferLignesEcran[ecranCourant][idx++], "Cons   : %.1f", (double)(getConsigne() / 10));
-                    if (getChauffageOnOff()){
-                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Chauff : ON");
-                    } else {
-                        sprintf(bufferLignesEcran[ecranCourant][idx++], "Chauff : OFF");
-                    }
+                    sprintf(bufferLignesEcran[ecranCourant][idx++], "Chauff : %s", getChauffageModeString());
                     if (getChauffageStatus()){
                         sprintf(bufferLignesEcran[ecranCourant][idx++], "Prog   : ON");
                     } else {

@@ -18,7 +18,7 @@
 int pinRelai = pinoutRelai;
 bool circulateurOnOff;
 bool lastCirculateurOnOff;
-bool chauffageOnOff;
+int modeChauffage;
 int commandeVanneChauffage;
 bool modeRegulation=false;
 
@@ -77,7 +77,7 @@ void initChaudiere(void){
     Serial.println("     Init pilotage chaudière (relai) ");
     Serial.println("------------------------------------");
     commandeVanneChauffage=0;
-    chauffageOnOff=false;
+    //modeChauffage=MODE_CHAUFFAGE_OFF;
     setPinRelai(pinRelai);
 }
 
@@ -115,7 +115,13 @@ bool getCirculateurOnOff(){
 //----------------------------------------------
 void refreshChaudiere(void){
     if (!temperatureAtteinte()){
-        circulateurOnOff = getChauffageOnOff() && getChauffageStatus();
+        if (getChauffageMode() == MODE_CHAUFFAGE_FORCE){
+            circulateurOnOff = true;
+        } else if (getCirculateurOnOff() == MODE_CHAUFFAGE_PROG){
+            circulateurOnOff = getChauffageStatus();
+        } else {
+            circulateurOnOff = MODE_CHAUFFAGE_OFF;
+        }
         if (circulateurOnOff){
             if (getRegulationMode()){
                 commandeVanneChauffage = calculDeltaRegulation(commandeVanneChauffage, getConsigne(), getTemperatureInterieure());
@@ -190,12 +196,21 @@ void handleCommandeChauffage() {
     page += "           <tbody>\n";
     page += "               <tr>\n";
     page += "                   <td> chauffage </td>\n";
-    if (chauffageOnOff){
-        page += "               <td align='center'> <a href='/switchChauffageOnOff'>  ON </a></td>\n";
-    }else {
-        page += "               <td align='center'> <a href='/switchChauffageOnOff'>  OFF </a></td>\n";
-    }
-    page += "                   <td> activation du chauffage : <br> ON : le calendrier (et la temperature) definissent la mise en route du circulateur <br> OFF : chauffage eteint</td>\n";
+    page += "                   <td align='center'>";
+    page += "                       <form action='/switchChauffageOnOff'>";
+    page += "                       <select name='mode' onChange='/switchChauffageOnOff'>";
+    page += "                           <option value='OFF'>OFF</option>";
+    page += "                           <option value='PROG'>PROG</option>";
+    page += "                           <option value='FORCE'>FORCE</option>";
+    page += "                       </select>";
+    page += "                       <br><button>Valider</button>";
+    page += "                       </form>";
+    page += "                   </td>\n";
+    page += "                   <td> activation du chauffage : ";
+    page += "                       <br> OFF : chauffage eteint";
+    page += "                       <br> PROG : le calendrier (et la temperature) definissent la mise en route du circulateur ";
+    page += "                       <br> FORCE : chauffage allumé sans régulation\n";
+    page += "                   </td>\n";
     page += "               </tr>\n";
     page += "               <tr>\n";
     page += "                   <td> plage <a href='/calendrier'>calendrier</a> </td>\n";
@@ -277,13 +292,23 @@ void handleCommandeChauffage() {
 //
 //----------------------------------------------
 void handleSwitchChauffageOnOff(void){
-    chauffageOnOff = !chauffageOnOff;
-    if (chauffageOnOff){
-        Serial.println("web : debut chauffage");
-    } else {
-        Serial.println("web : fin chauffage");
-        circulateurOnOff = false;
-        commandeVanneChauffage = 0;
+    Serial.println("handleSwitchChauffageOnOff");
+    String newMode = server.arg("mode");
+    modeChauffage = newMode.toInt();
+    Serial.print("modeChauffage = "); Serial.println(newMode);
+    switch(modeChauffage){
+        case MODE_CHAUFFAGE_OFF:
+            Serial.println("Mode chauffage => OFF");
+            break;
+        case MODE_CHAUFFAGE_PROG:
+            Serial.println("Mode chauffage => PROG");
+            break;
+        case MODE_CHAUFFAGE_FORCE:
+            Serial.println("Mode chauffage => FORCE");
+            break;
+        default:
+            Serial.println("Mode chauffage => indetermine");
+            break;
     }
     server.sendHeader("Location", String("/commande"), true);
     server.send ( 302, "text/plain", "");
@@ -295,6 +320,7 @@ void handleSwitchChauffageOnOff(void){
 //
 //----------------------------------------------
 void handleSwitchModeRegulation(void){
+    Serial.println("handleSwitchModeRegulation");
     modeRegulation = !modeRegulation;
     server.sendHeader("Location", String("/commande"), true);
     server.send ( 302, "text/plain", "");
@@ -302,11 +328,20 @@ void handleSwitchModeRegulation(void){
 
 //----------------------------------------------
 //
-//      getChauffageOnOff
+//      getChauffageMode
 //
 //----------------------------------------------
-bool getChauffageOnOff(){
-    return chauffageOnOff;
+void setChauffageMode(int mode){
+    modeChauffage = mode;
+}
+
+//----------------------------------------------
+//
+//      getChauffageMode
+//
+//----------------------------------------------
+int getChauffageMode(){
+    return modeChauffage;
 }
 
 //----------------------------------------------
@@ -314,6 +349,14 @@ bool getChauffageOnOff(){
 //      getChauffageOnOff
 //
 //----------------------------------------------
-void setChauffageOnOff(bool onOff){
-    chauffageOnOff = onOff ;
+char *getChauffageModeString(void){
+    switch(modeChauffage){
+        case MODE_CHAUFFAGE_OFF:
+            return (char*)"OFF";
+        case MODE_CHAUFFAGE_PROG:
+            return (char*)"PROG";
+        case MODE_CHAUFFAGE_FORCE:
+            return (char*)"FORCE";
+    }
+    return (char*)"";
 }
