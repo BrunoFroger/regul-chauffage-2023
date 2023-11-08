@@ -22,6 +22,7 @@
 
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include "wifiTools.hpp"
 
 WiFiUDP ntpUDP;
 /*
@@ -32,8 +33,12 @@ const char *ntpServer = "fr.pool.ntp.org";
 NTPClient temps(ntpUDP, ntpServer, 7200, 60000); // heure d'été
 char formatedTimeFull[30];
 char formatedTime[30];
-int dayOfWeek, heure, minute;
+char formatedDate[30];
+char fullDate[30];
+int dayOfWeek, heure, minute, jour, mois;
 char dayString[15];
+bool HeureEteHivers;
+time_t epochTime;
 
 //----------------------------------------------
 //
@@ -51,40 +56,6 @@ char *getDayString(int idx){
         case 6 : return ((char *)"samedi"); break;
     }
     return (char *)"inconnu";
-}
-
-//----------------------------------------------
-//
-//      refreshNtp
-//
-//----------------------------------------------
-void refreshNtp(void){
-    if ((heure == 0) && (minute == 0)) temps.update();
-    if (temps.getDay() != dayOfWeek){
-        dayOfWeek = temps.getDay();
-        strcpy(dayString, getDayString(dayOfWeek));
-    }
-    heure = temps.getHours();
-    minute = temps.getMinutes();
-    sprintf(formatedTimeFull, temps.getFormattedTime().c_str());
-    sprintf(formatedTime, "%02d:%02d", heure, minute);
-    //Serial.print("refresh Ntp : "); Serial.println(formatedTime);
-}
-
-//----------------------------------------------
-//
-//      initNtp
-//
-//----------------------------------------------
-void initNtp(){
-    Serial.println("======================");
-    Serial.println("     Init NTP         ");
-    Serial.println("----------------------");
-    temps.begin(); 
-    refreshNtp();
-    Serial.println("initialisation NTP => OK");
-    delay(10);
-    Serial.println(formatedTime);
 }
 
 //----------------------------------------------
@@ -129,10 +100,125 @@ int getHour(void){
 
 //----------------------------------------------
 //
-//      getHour
+//      getMinute
 //
 //----------------------------------------------
 int getMinute(void){
     //refreshNtp();
     return temps.getMinutes();
 }
+
+//----------------------------------------------
+//
+//      getJour
+//
+//----------------------------------------------
+int getJour(void){
+    //refreshNtp();
+    return jour;
+}
+
+//----------------------------------------------
+//
+//      getMois
+//
+//----------------------------------------------
+int getMois(void){
+    //refreshNtp();
+    return mois;
+}
+
+//----------------------------------------------
+//
+//      getHeureEteHivers
+//
+//----------------------------------------------
+int getHeureEteHivers(void){
+    //refreshNtp();
+    return HeureEteHivers;
+}
+
+//----------------------------------------------
+//
+//      getFormatedDate
+//
+//----------------------------------------------
+char *getFormatedDate(void){
+    //refreshNtp();
+    return formatedDate;
+}
+
+//----------------------------------------------
+//
+//      getFullDate
+//
+//----------------------------------------------
+char *getFullDate(void){
+    //refreshNtp();
+    return fullDate;
+}
+
+//----------------------------------------------
+//
+//      switchEteHiver
+//
+//----------------------------------------------
+void switchEteHiver(void){
+    HeureEteHivers = !HeureEteHivers;
+}
+
+//----------------------------------------------
+//
+//      refreshNtp
+//
+//----------------------------------------------
+void refreshNtp(void){
+    if (!HeureEteHivers){
+        // heure d'hiver
+        temps.setTimeOffset(3600);
+    } else {
+        // heure d'été
+        temps.setTimeOffset(0);
+    }
+    if ((heure == 0) && (minute == 0)) temps.update();
+    if (temps.getDay() != dayOfWeek){
+        dayOfWeek = temps.getDay();
+        strcpy(dayString, getDayString(dayOfWeek));
+    }
+    heure = temps.getHours();
+    minute = temps.getMinutes();
+    epochTime = temps.getEpochTime();
+    struct tm *ptm = gmtime ((time_t *)&epochTime);
+    jour = ptm->tm_mday;
+    mois = ptm->tm_mon+1;
+    sprintf(formatedTimeFull, temps.getFormattedTime().c_str());
+    sprintf(formatedTime, "%02d:%02d", heure, minute);
+    sprintf(formatedDate, "%02d/%02d", jour, mois);
+    sprintf(fullDate, "%s %02d/%02d", getDayString(getDayOfWeek()), jour, mois);
+    //Serial.print("refresh Ntp : "); Serial.println(formatedTime);
+}
+
+//----------------------------------------------
+//
+//      initNtp
+//
+//----------------------------------------------
+void initNtp(){
+    Serial.println("======================");
+    Serial.println("     Init NTP         ");
+    Serial.println("----------------------");
+    temps.begin(); 
+    refreshNtp();
+    if((mois >= 11) || (mois <= 4)){
+        // heure d'hiver
+        Serial.println("Heure d'ete");
+        HeureEteHivers = false;
+    } else {
+        Serial.println("Heure d'hiver");
+        HeureEteHivers = false;
+    }
+    Serial.println("initialisation NTP => OK");
+    delay(10);
+    Serial.println(formatedTime);
+}
+

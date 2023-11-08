@@ -16,5 +16,11 @@
     extern int getDayOfWeek(void);
     extern int getHour(void);
     extern int getMinute(void);
+    extern int getJour(void);
+    extern int getMois(void);
     extern char *getDayString(int idx);
+    extern bool getHeureEteHivers(void);
+    extern char *getFormatedDate(void);
+    extern char *getFullDate(void);
+    extern void switchEteHiver(void);
 #endif

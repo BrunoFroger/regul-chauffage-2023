@@ -152,8 +152,9 @@ void handleCommandeChauffage() {
     page += "   <h1> Gestion commande de chauffage </h1>\n";
 
     page += "   <div>\n";
-    page += "        <p>Nous sommes \n";
-    page +=          getDayString(getDayOfWeek());
+    page += "        <p>Nous sommes le \n";
+    //page +=          getDayString(getDayOfWeek());
+    page +=          getFullDate();
     page +=          ", il est ";
     page +=          getFormatedTime();
     page += "   <div>\n";

@@ -293,8 +293,8 @@ void handleTemperatures(void){
     page += "    <div>\n";
 
     page += "    <div>\n";
-    page += "        <p>Nous sommes \n";
-    page +=          getDayString(getDayOfWeek());
+    page += "        <p>Nous sommes le \n";
+    page +=          getFullDate();
     page +=          ", il est ";
     page +=          getFormatedTime();
     page += "    </div>\n";

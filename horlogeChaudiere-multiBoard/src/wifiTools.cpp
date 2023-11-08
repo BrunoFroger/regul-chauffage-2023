@@ -164,8 +164,8 @@ void handleRoot() {
     page += "    <h1> Gestion chauffage </h1>\n";
 
     page += "    <div>\n";
-    page += "        <p>Nous sommes \n";
-    page +=          getDayString(getDayOfWeek());
+    page += "        <p>Nous sommes le \n";
+    page +=          getFullDate();
     page +=          ", il est ";
     page +=          getFormatedTime();
     page += "    <div>\n";
@@ -386,7 +386,7 @@ bool initWifi(void){
     webPageStyle += "		margin-left:auto;";
     webPageStyle += "		margin-right:auto;";
     webPageStyle += "	}";
-	webPageStyle += "	button, select{";
+	webPageStyle += "	button, select, input{";
     webPageStyle += "		margin-left:auto;";
     webPageStyle += "		margin-right:auto;";
     webPageStyle += "		font-size:40px;";
@@ -400,6 +400,7 @@ bool initWifi(void){
     //  Definition de l'entete de page
     //
     enteteDePage += "    <div>";
+    enteteDePage += "        <br>";
     enteteDePage += "        <table>";
     enteteDePage += "            <tr>";
     enteteDePage += "                <td>";

@@ -13,6 +13,7 @@
 #include "wifiTools.hpp"
 #include "pilotageChaudiere.hpp"
 #include "sdCard.hpp"
+#include "ntp.hpp"
 
 // change this to match your SD shield or module;
 // WeMos Micro SD Shield V1.0.0: D8
@@ -435,6 +436,17 @@ void handleSauveConfig(void){
 
 //----------------------------------------------
 //
+//      handleSwitchEteHiver
+//
+//----------------------------------------------
+void handleSwitchEteHiver(void){
+    switchEteHiver();
+    server.sendHeader("Location", String("/config"), true);
+    server.send ( 302, "text/plain", "");
+}
+
+//----------------------------------------------
+//
 //      handleConfig
 //
 //----------------------------------------------
@@ -491,6 +503,14 @@ void handleConfig(void){
         page += "                  OFF\n";
     }
     page += "                   </td>\n";
+    page += "               </tr>\n";
+    page += "               <tr>\n";
+    page += "                   <td>Heure été/hiver</td>\n";
+    if (getHeureEteHivers()){
+        page += "               <td align='center'> <a href='/switchEteHiver'>été</a></td>\n";
+    }else {
+        page += "               <td align='center'> <a href='/switchEteHiver'>hiver</td>\n";
+    }
     page += "               </tr>\n";
     page += "               <tr>\n";
     page += "                   <td>chauffage</td>\n";
@@ -709,5 +729,6 @@ bool sdcardInit(void){
     server.on("/selectEnvironnement", handleSelectEnvironnement);
     server.on("/listFichierConfig", handleListFichierConfiguration);
     server.on("/updateIpTempInt", handleUpdateIpTempInt);
+    server.on("/switchEteHiver", handleSwitchEteHiver);
     return true;
 }

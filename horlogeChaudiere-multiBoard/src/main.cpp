@@ -16,8 +16,6 @@
 #include "scanI2C.hpp"
 #include "plagesModeles.hpp"
 
-
-
 #ifdef lolin_s2_mini
     #pragma message("lolin_s2_mini")
     #define TITRE "WeMos ESP8266"
@@ -64,10 +62,16 @@ void setup() {
             break;
         delay(10);
     }
-    char titre[50];
-    sprintf(titre, "+  %25s    +", TITRE);
     delay(1000);
     Serial.println("Serial initialized");
+    char titre[50];
+    int lngDecalageTexteDebut = (31 - strlen(TITRE)) / 2;
+    int lngDecalageTexteFin = 31 - lngDecalageTexteDebut - strlen(TITRE);
+    sprintf(titre, "+%*s%s%*s+", lngDecalageTexteDebut, " ", TITRE, lngDecalageTexteFin, " ");
+    //Serial.print("strlen(TITRE) = "); Serial.println(strlen(TITRE));
+    //Serial.print("lngDecalageTexteDebut = "); Serial.println(lngDecalageTexteDebut);
+    //Serial.print("lngDecalageTexteFin = "); Serial.println(lngDecalageTexteFin);
+    //               0123456789012345678901234567890
     Serial.println("+-------------------------------+");
     Serial.println("+                               +");
     Serial.println(titre);
@@ -76,6 +80,7 @@ void setup() {
     Serial.println("+-------------------------------+");
     Serial.println("+        debut setup            +");
     Serial.println("+                               +");
+    Serial.println("+-------------------------------+");
     initAfficheur();
     ecritLigneSuivante(0, (char *)"afficheur OK");
     if (1) {
@@ -108,6 +113,8 @@ void setup() {
     }
     ecritLigneSuivante(0, getWifiSsid());
     ecritLigneSuivante(0, getIpAddress());
+    Serial.println("+-------------------------------+");
+    Serial.println("+                               +");
     Serial.println("+        fin setup              +");
     Serial.println("+                               +");
     Serial.println("+-------------------------------+");
